@@ -324,3 +324,28 @@ def test_cli_upgrade_with_python_version(tmp_path):
 
     updated_content = script.read_text()
     assert 'requires-python = ">=3.12"' in updated_content
+
+
+def test_cli_upgrade_no_dependencies_message(tmp_path, capsys):
+    """Test CLI upgrade command shows message when no dependencies detected."""
+    script = tmp_path / "test_script.py"
+    script.write_text("""import os
+import sys
+print("Hello, world!")
+""")
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", "upgrade", str(script)])
+        main()
+
+    captured = capsys.readouterr()
+    assert "No third-party dependencies detected" in captured.out
+
+
+def test_cli_no_arguments_coverage():
+    """Test CLI with only program name to cover is_default_run_command with no args."""
+    from autopep723.cli import is_default_run_command
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723"])
+        assert is_default_run_command() is False
