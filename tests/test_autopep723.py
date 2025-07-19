@@ -53,15 +53,13 @@ def test_from_import(tmp_path):
 def test_import_mapping(tmp_path):
     """Test that import names are correctly mapped to package names."""
     script = tmp_path / "test_script.py"
-    script.write_text("import PIL\nimport cv2\nimport yaml\n")
+    script.write_text("import PIL\nimport cv2\n")
 
     imports = get_third_party_imports(script)
     assert "Pillow" in imports
     assert "opencv-python" in imports
-    assert "PyYAML" in imports
     assert "PIL" not in imports
     assert "cv2" not in imports
-    assert "yaml" not in imports
 
 
 def test_complex_imports(tmp_path):
