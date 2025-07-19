@@ -47,18 +47,13 @@ select = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
 addopts = [
     "--cov=src/autopep723",
     "--cov-report=term-missing",
-    "--cov-report=html",
     "--cov-fail-under=99.5",
-    "--strict-markers",
-    "--strict-config",
-    "-ra",
+    "--strict-markers",          # Fail if markers are not registered in pytest configuration
+    "--strict-config",           # Fail if there are errors in pytest configuration
+    "-ra",                       # Show extra test summary info for all except passed tests
 ]
 
 [tool.coverage.run]
