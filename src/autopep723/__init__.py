@@ -1,4 +1,3 @@
-import argparse
 import ast
 import pkgutil
 import subprocess
@@ -6,7 +5,6 @@ import sys
 from pathlib import Path
 
 from rich.console import Console
-from rich.syntax import Syntax
 
 console = Console()
 
@@ -220,129 +218,36 @@ def has_pep723_metadata(script_path: Path) -> bool:
         return False
 
 
-def create_argument_parser() -> argparse.ArgumentParser:
-    """Create and configure the argument parser."""
-    parser = argparse.ArgumentParser(
-        description="Auto-generate PEP 723 metadata for Python scripts",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  autopep723 script.py                   # Run script (default behavior)
-  autopep723 check script.py             # Print metadata to stdout
-  autopep723 upgrade script.py           # Update file with metadata
-
-Shebang usage:
-  #!/usr/bin/env autopep723
-  import requests
-  print("Hello world!")
-        """,
-    )
-
-    parser.add_argument("--version", action="version", version="%(prog)s 1.0.0")
-
-    # Create subparsers
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-
-    # Check command
-    check_parser = subparsers.add_parser("check", help="Analyze script and print metadata")
-    check_parser.add_argument("script", help="Path to Python script")
-    check_parser.add_argument("--python-version", default=">=3.13", help="Required Python version (default: >=3.13)")
-
-    # Upgrade command
-    upgrade_parser = subparsers.add_parser("upgrade", help="Update script with metadata")
-    upgrade_parser.add_argument("script", help="Path to Python script")
-    upgrade_parser.add_argument("--python-version", default=">=3.13", help="Required Python version (default: >=3.13)")
-
-    return parser
-
-
-def handle_default_run(script_path: Path) -> None:
-    """Handle the default run behavior for a script."""
-    # Check if uv is available
-    if not check_uv_available():
-        console.print("[red]Error: 'uv' is not installed or not available in PATH.[/red]")
-        console.print("Please install uv: https://github.com/astral-sh/uv")
-        sys.exit(1)
-
-    if not script_path.exists():
-        console.print(f"[red]Error: Script '{script_path}' does not exist.[/red]")
-        sys.exit(1)
-
-    if script_path.suffix != ".py":
-        console.print(f"[yellow]Warning: '{script_path}' does not have a .py extension.[/yellow]")
-
-    # Check for existing PEP 723 metadata
-    if has_pep723_metadata(script_path):
-        console.print("[blue]Script already has PEP 723 metadata. Using existing dependencies.[/blue]")
-        run_with_uv(script_path, [])  # Let uv handle dependencies from metadata
-    else:
-        # Analyze imports and run with detected dependencies
-        dependencies = get_third_party_imports(script_path)
-
-        if dependencies:
-            console.print(f"[blue]Detected dependencies:[/blue] {', '.join(dependencies)}")
-        else:
-            console.print("[blue]No third-party dependencies detected.[/blue]")
-
-        run_with_uv(script_path, dependencies)
-
-
-def handle_check_command(args) -> None:
-    """Handle the check command."""
-    script_path = Path(args.script)
-    if not script_path.exists():
-        console.print(f"[red]Error: Script '{script_path}' does not exist.[/red]")
-        sys.exit(1)
-
-    dependencies = get_third_party_imports(script_path)
-    metadata = generate_pep723_metadata(dependencies, args.python_version)
-
-    syntax = Syntax(metadata, "toml", theme="monokai", line_numbers=False)
-    console.print(syntax)
-
-
-def handle_upgrade_command(args) -> None:
-    """Handle the upgrade command."""
-    script_path = Path(args.script)
-    if not script_path.exists():
-        console.print(f"[red]Error: Script '{script_path}' does not exist.[/red]")
-        sys.exit(1)
-
-    dependencies = get_third_party_imports(script_path)
-    metadata = generate_pep723_metadata(dependencies, args.python_version)
-
-    update_file_with_metadata(script_path, metadata)
-    console.print(f"[green]Updated {script_path} with PEP 723 metadata.[/green]")
-
-    if dependencies:
-        console.print(f"[blue]Dependencies:[/blue] {', '.join(dependencies)}")
-    else:
-        console.print("[blue]No third-party dependencies detected.[/blue]")
-
-
 def main() -> None:
     """Main entry point for autopep723."""
-    parser = create_argument_parser()
+    from .cli import (
+        create_parser,
+        get_script_path_from_args,
+        is_default_run_command,
+        should_show_help,
+    )
+    from .commands import check_command, run_script_command, upgrade_command
 
-    # Parse args with special handling for default case
-    if len(sys.argv) == 1:
+    # Handle help case
+    if should_show_help():
+        parser = create_parser()
         parser.print_help()
         sys.exit(1)
 
-    # If first argument is not a subcommand, treat it as script to run
-    if len(sys.argv) >= 2 and sys.argv[1] not in ["check", "upgrade", "--help", "--version", "-h"]:
-        # Default behavior: run script
-        script_path = Path(sys.argv[1])
-        handle_default_run(script_path)
+    # Handle default run command (script execution)
+    if is_default_run_command():
+        script_path = get_script_path_from_args()
+        run_script_command(script_path)
         return
 
+    # Handle subcommands
+    parser = create_parser()
     args = parser.parse_args()
 
-    # Handle subcommands
     if args.command == "check":
-        handle_check_command(args)
+        check_command(args.script, args.python_version)
     elif args.command == "upgrade":
-        handle_upgrade_command(args)
+        upgrade_command(args.script, args.python_version)
 
 
 if __name__ == "__main__":

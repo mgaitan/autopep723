@@ -53,13 +53,15 @@ def test_from_import(tmp_path):
 def test_import_mapping(tmp_path):
     """Test that import names are correctly mapped to package names."""
     script = tmp_path / "test_script.py"
-    script.write_text("import PIL\nimport cv2\n")
+    script.write_text("import PIL\nimport cv2\nimport sklearn\n")
 
     imports = get_third_party_imports(script)
     assert "Pillow" in imports
     assert "opencv-python" in imports
+    assert "scikit-learn" in imports
     assert "PIL" not in imports
     assert "cv2" not in imports
+    assert "sklearn" not in imports
 
 
 def test_complex_imports(tmp_path):
@@ -280,7 +282,15 @@ def test_run_with_uv_success(mocker):
 
     run_with_uv(script_path, dependencies)
 
-    expected_cmd = ["uv", "run", "--with", "requests", "--with", "numpy", "test_script.py"]
+    expected_cmd = [
+        "uv",
+        "run",
+        "--with",
+        "requests",
+        "--with",
+        "numpy",
+        "test_script.py",
+    ]
     mock_subprocess.assert_called_once_with(expected_cmd, check=True)
 
 
