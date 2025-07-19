@@ -31,13 +31,13 @@ def generate_sample_data():
         n_informative=15,
         n_redundant=5,
         n_classes=3,
-        random_state=42
+        random_state=42,
     )
 
     # Convert to DataFrame for easier handling
-    feature_names = [f'feature_{i}' for i in range(X.shape[1])]
+    feature_names = [f"feature_{i}" for i in range(X.shape[1])]
     df = pd.DataFrame(X, columns=feature_names)
-    df['target'] = y
+    df["target"] = y
 
     return df
 
@@ -51,7 +51,7 @@ def explore_data(df):
 
     # Basic statistics
     print("\nTarget distribution:")
-    print(df['target'].value_counts().sort_index())
+    print(df["target"].value_counts().sort_index())
 
     # Check for missing values
     missing_values = df.isnull().sum().sum()
@@ -66,34 +66,34 @@ def visualize_data(df):
 
     # Set style
     sns.set_style("whitegrid")
-    plt.rcParams['figure.figsize'] = (12, 8)
+    plt.rcParams["figure.figsize"] = (12, 8)
 
     # Create subplots
     fig, axes = plt.subplots(2, 2, figsize=(15, 12))
 
     # Target distribution
-    df['target'].value_counts().sort_index().plot(kind='bar', ax=axes[0, 0])
-    axes[0, 0].set_title('Target Class Distribution')
-    axes[0, 0].set_xlabel('Class')
-    axes[0, 0].set_ylabel('Count')
+    df["target"].value_counts().sort_index().plot(kind="bar", ax=axes[0, 0])
+    axes[0, 0].set_title("Target Class Distribution")
+    axes[0, 0].set_xlabel("Class")
+    axes[0, 0].set_ylabel("Count")
 
     # Feature correlation heatmap (first 10 features)
     corr_matrix = df.iloc[:, :10].corr()
-    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', center=0, ax=axes[0, 1])
-    axes[0, 1].set_title('Feature Correlation Matrix (First 10 Features)')
+    sns.heatmap(corr_matrix, annot=True, cmap="coolwarm", center=0, ax=axes[0, 1])
+    axes[0, 1].set_title("Feature Correlation Matrix (First 10 Features)")
 
     # Feature distributions
     df.iloc[:, :5].hist(bins=20, ax=axes[1, 0])
-    axes[1, 0].set_title('Distribution of First 5 Features')
+    axes[1, 0].set_title("Distribution of First 5 Features")
 
     # Box plot of features by target
     df_melted = pd.melt(df.iloc[:, :5], id_vars=[], value_vars=df.columns[:5])
-    sns.boxplot(data=df_melted, x='variable', y='value', ax=axes[1, 1])
-    axes[1, 1].set_title('Feature Distributions')
-    axes[1, 1].tick_params(axis='x', rotation=45)
+    sns.boxplot(data=df_melted, x="variable", y="value", ax=axes[1, 1])
+    axes[1, 1].set_title("Feature Distributions")
+    axes[1, 1].tick_params(axis="x", rotation=45)
 
     plt.tight_layout()
-    plt.savefig('data_exploration.png', dpi=300, bbox_inches='tight')
+    plt.savefig("data_exploration.png", dpi=300, bbox_inches="tight")
     print("✓ Saved visualization: data_exploration.png")
 
     plt.show()
@@ -104,8 +104,8 @@ def train_model(df):
     print("\n=== Training Model ===")
 
     # Prepare features and target
-    X = df.drop('target', axis=1)
-    y = df['target']
+    X = df.drop("target", axis=1)
+    y = df["target"]
 
     # Split the data
     X_train, X_test, y_train, y_test = train_test_split(
@@ -122,10 +122,7 @@ def train_model(df):
 
     # Train Random Forest model
     rf_model = RandomForestClassifier(
-        n_estimators=100,
-        max_depth=10,
-        random_state=42,
-        n_jobs=-1
+        n_estimators=100, max_depth=10, random_state=42, n_jobs=-1
     )
 
     print("Training Random Forest classifier...")
@@ -143,26 +140,25 @@ def train_model(df):
     cm = confusion_matrix(y_test, y_pred)
 
     plt.figure(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
-    plt.title('Confusion Matrix')
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
-    plt.savefig('confusion_matrix.png', dpi=300, bbox_inches='tight')
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+    plt.title("Confusion Matrix")
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.savefig("confusion_matrix.png", dpi=300, bbox_inches="tight")
     print("✓ Saved confusion matrix: confusion_matrix.png")
     plt.show()
 
     # Feature importance
-    feature_importance = pd.DataFrame({
-        'feature': X.columns,
-        'importance': rf_model.feature_importances_
-    }).sort_values('importance', ascending=False)
+    feature_importance = pd.DataFrame(
+        {"feature": X.columns, "importance": rf_model.feature_importances_}
+    ).sort_values("importance", ascending=False)
 
     plt.figure(figsize=(10, 8))
-    sns.barplot(data=feature_importance.head(15), x='importance', y='feature')
-    plt.title('Top 15 Feature Importances')
-    plt.xlabel('Importance')
+    sns.barplot(data=feature_importance.head(15), x="importance", y="feature")
+    plt.title("Top 15 Feature Importances")
+    plt.xlabel("Importance")
     plt.tight_layout()
-    plt.savefig('feature_importance.png', dpi=300, bbox_inches='tight')
+    plt.savefig("feature_importance.png", dpi=300, bbox_inches="tight")
     print("✓ Saved feature importance: feature_importance.png")
     plt.show()
 
@@ -174,26 +170,27 @@ def save_results(df, model, scaler, feature_importance):
     print("\n=== Saving Results ===")
 
     # Save processed dataset
-    df.to_csv('processed_dataset.csv', index=False)
+    df.to_csv("processed_dataset.csv", index=False)
     print("✓ Saved dataset: processed_dataset.csv")
 
     # Save feature importance
-    feature_importance.to_csv('feature_importance.csv', index=False)
+    feature_importance.to_csv("feature_importance.csv", index=False)
     print("✓ Saved feature importance: feature_importance.csv")
 
     # Create summary report
     report = {
-        'dataset_shape': df.shape,
-        'n_features': df.shape[1] - 1,
-        'n_samples': df.shape[0],
-        'target_classes': sorted(df['target'].unique()),
-        'class_distribution': df['target'].value_counts().to_dict(),
-        'top_5_features': feature_importance.head(5)['feature'].tolist()
+        "dataset_shape": df.shape,
+        "n_features": df.shape[1] - 1,
+        "n_samples": df.shape[0],
+        "target_classes": sorted(df["target"].unique()),
+        "class_distribution": df["target"].value_counts().to_dict(),
+        "top_5_features": feature_importance.head(5)["feature"].tolist(),
     }
 
     # Save summary as JSON
     import json
-    with open('analysis_summary.json', 'w') as f:
+
+    with open("analysis_summary.json", "w") as f:
         json.dump(report, f, indent=2, default=str)
     print("✓ Saved summary: analysis_summary.json")
 
