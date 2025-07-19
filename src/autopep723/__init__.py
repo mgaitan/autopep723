@@ -220,8 +220,8 @@ def has_pep723_metadata(script_path: Path) -> bool:
         return False
 
 
-def main() -> None:  # noqa: C901
-    """Main entry point for autopep723."""
+def create_argument_parser() -> argparse.ArgumentParser:
+    """Create and configure the argument parser."""
     parser = argparse.ArgumentParser(
         description="Auto-generate PEP 723 metadata for Python scripts",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -253,6 +253,77 @@ Shebang usage:
     upgrade_parser.add_argument("script", help="Path to Python script")
     upgrade_parser.add_argument("--python-version", default=">=3.13", help="Required Python version (default: >=3.13)")
 
+    return parser
+
+
+def handle_default_run(script_path: Path) -> None:
+    """Handle the default run behavior for a script."""
+    # Check if uv is available
+    if not check_uv_available():
+        console.print("[red]Error: 'uv' is not installed or not available in PATH.[/red]")
+        console.print("Please install uv: https://github.com/astral-sh/uv")
+        sys.exit(1)
+
+    if not script_path.exists():
+        console.print(f"[red]Error: Script '{script_path}' does not exist.[/red]")
+        sys.exit(1)
+
+    if script_path.suffix != ".py":
+        console.print(f"[yellow]Warning: '{script_path}' does not have a .py extension.[/yellow]")
+
+    # Check for existing PEP 723 metadata
+    if has_pep723_metadata(script_path):
+        console.print("[blue]Script already has PEP 723 metadata. Using existing dependencies.[/blue]")
+        run_with_uv(script_path, [])  # Let uv handle dependencies from metadata
+    else:
+        # Analyze imports and run with detected dependencies
+        dependencies = get_third_party_imports(script_path)
+
+        if dependencies:
+            console.print(f"[blue]Detected dependencies:[/blue] {', '.join(dependencies)}")
+        else:
+            console.print("[blue]No third-party dependencies detected.[/blue]")
+
+        run_with_uv(script_path, dependencies)
+
+
+def handle_check_command(args) -> None:
+    """Handle the check command."""
+    script_path = Path(args.script)
+    if not script_path.exists():
+        console.print(f"[red]Error: Script '{script_path}' does not exist.[/red]")
+        sys.exit(1)
+
+    dependencies = get_third_party_imports(script_path)
+    metadata = generate_pep723_metadata(dependencies, args.python_version)
+
+    syntax = Syntax(metadata, "toml", theme="monokai", line_numbers=False)
+    console.print(syntax)
+
+
+def handle_upgrade_command(args) -> None:
+    """Handle the upgrade command."""
+    script_path = Path(args.script)
+    if not script_path.exists():
+        console.print(f"[red]Error: Script '{script_path}' does not exist.[/red]")
+        sys.exit(1)
+
+    dependencies = get_third_party_imports(script_path)
+    metadata = generate_pep723_metadata(dependencies, args.python_version)
+
+    update_file_with_metadata(script_path, metadata)
+    console.print(f"[green]Updated {script_path} with PEP 723 metadata.[/green]")
+
+    if dependencies:
+        console.print(f"[blue]Dependencies:[/blue] {', '.join(dependencies)}")
+    else:
+        console.print("[blue]No third-party dependencies detected.[/blue]")
+
+
+def main() -> None:
+    """Main entry point for autopep723."""
+    parser = create_argument_parser()
+
     # Parse args with special handling for default case
     if len(sys.argv) == 1:
         parser.print_help()
@@ -262,69 +333,16 @@ Shebang usage:
     if len(sys.argv) >= 2 and sys.argv[1] not in ["check", "upgrade", "--help", "--version", "-h"]:
         # Default behavior: run script
         script_path = Path(sys.argv[1])
-
-        # Check if uv is available
-        if not check_uv_available():
-            console.print("[red]Error: 'uv' is not installed or not available in PATH.[/red]")
-            console.print("Please install uv: https://github.com/astral-sh/uv")
-            sys.exit(1)
-
-        if not script_path.exists():
-            console.print(f"[red]Error: Script '{script_path}' does not exist.[/red]")
-            sys.exit(1)
-
-        if script_path.suffix != ".py":
-            console.print(f"[yellow]Warning: '{script_path}' does not have a .py extension.[/yellow]")
-
-        # Check for existing PEP 723 metadata
-        if has_pep723_metadata(script_path):
-            console.print("[blue]Script already has PEP 723 metadata. Using existing dependencies.[/blue]")
-            run_with_uv(script_path, [])  # Let uv handle dependencies from metadata
-        else:
-            # Analyze imports and run with detected dependencies
-            dependencies = get_third_party_imports(script_path)
-
-            if dependencies:
-                console.print(f"[blue]Detected dependencies:[/blue] {', '.join(dependencies)}")
-            else:
-                console.print("[blue]No third-party dependencies detected.[/blue]")
-
-            run_with_uv(script_path, dependencies)
+        handle_default_run(script_path)
         return
 
     args = parser.parse_args()
 
     # Handle subcommands
     if args.command == "check":
-        script_path = Path(args.script)
-        if not script_path.exists():
-            console.print(f"[red]Error: Script '{script_path}' does not exist.[/red]")
-            sys.exit(1)
-
-        dependencies = get_third_party_imports(script_path)
-        metadata = generate_pep723_metadata(dependencies, args.python_version)
-
-        syntax = Syntax(metadata, "toml", theme="monokai", line_numbers=False)
-        console.print(syntax)
-        return
-
+        handle_check_command(args)
     elif args.command == "upgrade":
-        script_path = Path(args.script)
-        if not script_path.exists():
-            console.print(f"[red]Error: Script '{script_path}' does not exist.[/red]")
-            sys.exit(1)
-
-        dependencies = get_third_party_imports(script_path)
-        metadata = generate_pep723_metadata(dependencies, args.python_version)
-
-        update_file_with_metadata(script_path, metadata)
-        console.print(f"[green]Updated {script_path} with PEP 723 metadata.[/green]")
-
-        if dependencies:
-            console.print(f"[blue]Dependencies:[/blue] {', '.join(dependencies)}")
-        else:
-            console.print("[blue]No third-party dependencies detected.[/blue]")
-        return
+        handle_upgrade_command(args)
 
 
 if __name__ == "__main__":

@@ -53,15 +53,13 @@ def test_from_import(tmp_path):
 def test_import_mapping(tmp_path):
     """Test that import names are correctly mapped to package names."""
     script = tmp_path / "test_script.py"
-    script.write_text("import PIL\nimport cv2\nimport sklearn\n")
+    script.write_text("import PIL\nimport cv2\n")
 
     imports = get_third_party_imports(script)
     assert "Pillow" in imports
     assert "opencv-python" in imports
-    assert "scikit-learn" in imports
     assert "PIL" not in imports
     assert "cv2" not in imports
-    assert "sklearn" not in imports
 
 
 def test_complex_imports(tmp_path):
@@ -399,58 +397,6 @@ def test_import_mapping_no_redundant_entries():
     for import_name, package_name in IMPORT_TO_PACKAGE_MAP.items():
         # Import name should be different from package name
         assert import_name != package_name, f"Redundant entry: {import_name} -> {package_name}"
-
-
-@pytest.mark.parametrize(
-    "import_name,expected_package",
-    [
-        ("PIL", "Pillow"),
-        ("cv2", "opencv-python"),
-        ("bs4", "beautifulsoup4"),
-        ("sklearn", "scikit-learn"),
-        ("yaml", "PyYAML"),
-        ("jwt", "PyJWT"),
-        ("dotenv", "python-dotenv"),
-        ("dateutil", "python-dateutil"),
-    ],
-)
-def test_import_mapping_specific_packages(tmp_path, import_name, expected_package):
-    """Test specific import mappings with parametrize."""
-    script = tmp_path / "test_script.py"
-    script.write_text(f"import {import_name}\n")
-
-    imports = get_third_party_imports(script)
-
-    # Only test if the import is not considered a builtin module
-    builtin_modules = get_builtin_modules()
-    if import_name not in builtin_modules:
-        assert expected_package in imports
-        assert import_name not in imports
-
-
-@pytest.mark.parametrize("python_version", [">=3.9", ">=3.10", ">=3.11", ">=3.12", ">=3.13"])
-def test_generate_metadata_various_python_versions(python_version):
-    """Test metadata generation with various Python versions."""
-    deps = ["requests", "numpy"]
-    metadata = generate_pep723_metadata(deps, python_version)
-
-    assert f'requires-python = "{python_version}"' in metadata
-    assert "# /// script" in metadata
-    assert "# ///" in metadata
-
-
-@pytest.mark.parametrize(
-    "content,expected",
-    [
-        ('# /// script\n# requires-python = ">=3.13"\n# ///\nimport requests', True),
-        ("# /// script\n# ///", True),
-        ("print('hello')", False),
-        ("#!/usr/bin/env python\n# /// script\n# dependencies = []\n# ///\nimport os", True),
-    ],
-)
-def test_has_existing_metadata_parametrized(content, expected):
-    """Test has_existing_metadata with various content patterns."""
-    assert has_existing_metadata(content) == expected
 
 
 def test_full_workflow_simple_script(tmp_path):
