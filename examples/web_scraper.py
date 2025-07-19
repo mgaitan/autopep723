@@ -12,9 +12,7 @@ def scrape_website(url):
     """Simple web scraper example using requests and BeautifulSoup."""
 
     # Make request with headers to avoid being blocked
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-    }
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
     try:
         response = requests.get(url, headers=headers, timeout=10)

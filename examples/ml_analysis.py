@@ -26,12 +26,7 @@ def generate_sample_data():
 
     # Create synthetic dataset
     X, y = make_classification(
-        n_samples=1000,
-        n_features=20,
-        n_informative=15,
-        n_redundant=5,
-        n_classes=3,
-        random_state=42,
+        n_samples=1000, n_features=20, n_informative=15, n_redundant=5, n_classes=3, random_state=42
     )
 
     # Convert to DataFrame for easier handling
@@ -108,9 +103,7 @@ def train_model(df):
     y = df["target"]
 
     # Split the data
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
     print(f"Training set size: {X_train.shape[0]}")
     print(f"Test set size: {X_test.shape[0]}")
@@ -121,9 +114,7 @@ def train_model(df):
     X_test_scaled = scaler.transform(X_test)
 
     # Train Random Forest model
-    rf_model = RandomForestClassifier(
-        n_estimators=100, max_depth=10, random_state=42, n_jobs=-1
-    )
+    rf_model = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42, n_jobs=-1)
 
     print("Training Random Forest classifier...")
     rf_model.fit(X_train_scaled, y_train)
@@ -149,9 +140,9 @@ def train_model(df):
     plt.show()
 
     # Feature importance
-    feature_importance = pd.DataFrame(
-        {"feature": X.columns, "importance": rf_model.feature_importances_}
-    ).sort_values("importance", ascending=False)
+    feature_importance = pd.DataFrame({"feature": X.columns, "importance": rf_model.feature_importances_}).sort_values(
+        "importance", ascending=False
+    )
 
     plt.figure(figsize=(10, 8))
     sns.barplot(data=feature_importance.head(15), x="importance", y="feature")
