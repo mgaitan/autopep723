@@ -77,7 +77,7 @@ def get_third_party_imports(file_path: Path) -> list[str]:
     Returns:
         List of third-party package names
     """
-    with open(file_path, "r", encoding="utf-8") as file:
+    with open(file_path, encoding="utf-8") as file:
         try:
             content = file.read()
             tree = ast.parse(content)
@@ -93,10 +93,9 @@ def get_third_party_imports(file_path: Path) -> list[str]:
             for name in node.names:
                 module_name = name.name.split(".")[0]
                 all_imports.add(module_name)
-        elif isinstance(node, ast.ImportFrom):
-            if node.module:
-                module_name = node.module.split(".")[0]
-                all_imports.add(module_name)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            module_name = node.module.split(".")[0]
+            all_imports.add(module_name)
 
     # Filter out built-in modules and convert to package names
     third_party_imports = []
@@ -163,7 +162,7 @@ def extract_existing_metadata(content: str) -> tuple[str, str, str]:
 
 def update_file_with_metadata(file_path: Path, metadata: str) -> None:
     """Update the file with new PEP 723 metadata."""
-    with open(file_path, "r", encoding="utf-8") as file:
+    with open(file_path, encoding="utf-8") as file:
         content = file.read()
 
     if has_existing_metadata(content):
@@ -214,7 +213,7 @@ def check_uv_available() -> bool:
 def has_pep723_metadata(script_path: Path) -> bool:
     """Check if script already has PEP 723 metadata."""
     try:
-        with open(script_path, "r", encoding="utf-8") as f:
+        with open(script_path, encoding="utf-8") as f:
             content = f.read()
             return has_existing_metadata(content)
     except Exception:
@@ -236,7 +235,7 @@ Shebang usage:
   #!/usr/bin/env autopep723
   import requests
   print("Hello world!")
-        """
+        """,
     )
 
     parser.add_argument("--version", action="version", version="%(prog)s 1.0.0")
@@ -247,20 +246,12 @@ Shebang usage:
     # Check command
     check_parser = subparsers.add_parser("check", help="Analyze script and print metadata")
     check_parser.add_argument("script", help="Path to Python script")
-    check_parser.add_argument(
-        "--python-version",
-        default=">=3.13",
-        help="Required Python version (default: >=3.13)"
-    )
+    check_parser.add_argument("--python-version", default=">=3.13", help="Required Python version (default: >=3.13)")
 
     # Upgrade command
     upgrade_parser = subparsers.add_parser("upgrade", help="Update script with metadata")
     upgrade_parser.add_argument("script", help="Path to Python script")
-    upgrade_parser.add_argument(
-        "--python-version",
-        default=">=3.13",
-        help="Required Python version (default: >=3.13)"
-    )
+    upgrade_parser.add_argument("--python-version", default=">=3.13", help="Required Python version (default: >=3.13)")
 
     # Parse args with special handling for default case
     if len(sys.argv) == 1:
@@ -268,7 +259,7 @@ Shebang usage:
         sys.exit(1)
 
     # If first argument is not a subcommand, treat it as script to run
-    if len(sys.argv) >= 2 and sys.argv[1] not in ['check', 'upgrade', '--help', '--version', '-h']:
+    if len(sys.argv) >= 2 and sys.argv[1] not in ["check", "upgrade", "--help", "--version", "-h"]:
         # Default behavior: run script
         script_path = Path(sys.argv[1])
 
@@ -282,7 +273,7 @@ Shebang usage:
             console.print(f"[red]Error: Script '{script_path}' does not exist.[/red]")
             sys.exit(1)
 
-        if not script_path.suffix == ".py":
+        if script_path.suffix != ".py":
             console.print(f"[yellow]Warning: '{script_path}' does not have a .py extension.[/yellow]")
 
         # Check for existing PEP 723 metadata
