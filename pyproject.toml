@@ -1,0 +1,41 @@
+[project]
+name = "autopep723"
+version = "0.1.0"
+description = "Auto-generate PEP 723 metadata for Python scripts by analyzing imports"
+readme = "README.md"
+authors = [{ name = "Martín Gaitán", email = "gaitan@gmail.com" }]
+requires-python = ">=3.9"
+dependencies = ["rich>=12.0.0"]
+
+[tool.uv]
+dev-dependencies = ["pytest>=8.0.0", "pytest-mock>=3.12.0", "ruff>=0.12.4"]
+
+[project.scripts]
+autopep723 = "autopep723:main"
+
+[build-system]
+requires = ["uv_build>=0.8.0,<0.9"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "W",      # pycodestyle (E, W) https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
+    "F",      # https://docs.astral.sh/ruff/rules/#pyflakes-f
+    "I",      # isort
+    "C90",    # https://docs.astral.sh/ruff/rules/#mccabe-c90
+    "UP",     # https://docs.astral.sh/ruff/rules/#pyupgrade-up
+    "RUF",    # https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
+    "T10",    # remove pdbs
+    "ISC",    # https://docs.astral.sh/ruff/rules/#flake8-implicit-str-concat-isc
+    "SIM",    # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
+    "ASYNC",  # https://docs.astral.sh/ruff/rules/#flake8-async-async
+    "B",      # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+    "C4",     # https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
+    "PIE",    # https://docs.astral.sh/ruff/rules/#flake8-pie-pie
+    "FURB",   # https://docs.astral.sh/ruff/rules/#refurb-furb
+    "TID252", # https://docs.astral.sh/ruff/rules/relative-imports/
+]
