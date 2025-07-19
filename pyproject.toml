@@ -8,11 +8,7 @@ requires-python = ">=3.13"
 dependencies = ["rich>=13.0.0"]
 
 [tool.uv]
-dev-dependencies = [
-    "pytest>=8.0.0",
- "pytest-mock>=3.12.0",
- "ruff>=0.12.4",
-]
+dev-dependencies = ["pytest>=8.0.0", "pytest-mock>=3.12.0", "ruff>=0.12.4"]
 
 [project.scripts]
 autopep723 = "autopep723:main"
@@ -20,6 +16,9 @@ autopep723 = "autopep723:main"
 [build-system]
 requires = ["uv_build>=0.8.0,<0.9"]
 build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 120
 
 [tool.ruff.lint]
 select = [

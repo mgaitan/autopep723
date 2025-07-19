@@ -54,7 +54,7 @@ def test_cli_custom_python_version(tmp_path, capsys):
 
 def test_cli_default_run_command(tmp_path, mocker):
     """Test CLI default run behavior."""
-    mock_check_uv = mocker.patch('autopep723.check_uv_available', return_value=True)
+    mocker.patch('autopep723.check_uv_available', return_value=True)
     mock_run_with_uv = mocker.patch('autopep723.run_with_uv')
 
     script = tmp_path / "test_script.py"
@@ -104,8 +104,8 @@ def test_cli_upgrade_nonexistent_file():
 
 def test_cli_non_python_file_warning(tmp_path, mocker):
     """Test CLI with non-Python file shows warning."""
-    mock_check_uv = mocker.patch('autopep723.check_uv_available', return_value=True)
-    mock_run_with_uv = mocker.patch('autopep723.run_with_uv')
+    mocker.patch('autopep723.check_uv_available', return_value=True)
+    mocker.patch('autopep723.run_with_uv')
 
     script = tmp_path / "test_script.txt"
     script.write_text("import requests")
@@ -117,7 +117,7 @@ def test_cli_non_python_file_warning(tmp_path, mocker):
 
 def test_cli_run_with_dependencies_displays_info(tmp_path, mocker):
     """Test that CLI default run displays dependency information."""
-    mock_check_uv = mocker.patch('autopep723.check_uv_available', return_value=True)
+    mocker.patch('autopep723.check_uv_available', return_value=True)
     mock_subprocess = mocker.patch('autopep723.subprocess.run')
     mock_subprocess.return_value.returncode = 0
 
@@ -142,7 +142,7 @@ import numpy as np
 
 def test_cli_run_no_dependencies(tmp_path, mocker):
     """Test CLI default run with script that has no dependencies."""
-    mock_check_uv = mocker.patch('autopep723.check_uv_available', return_value=True)
+    mocker.patch('autopep723.check_uv_available', return_value=True)
     mock_subprocess = mocker.patch('autopep723.subprocess.run')
     mock_subprocess.return_value.returncode = 0
 
@@ -245,8 +245,8 @@ def test_cli_empty_file(tmp_path, capsys):
 
 def test_cli_run_with_existing_metadata(tmp_path, mocker):
     """Test CLI default run when script already has PEP 723 metadata."""
-    mock_check_uv = mocker.patch('autopep723.check_uv_available', return_value=True)
-    mock_has_metadata = mocker.patch('autopep723.has_pep723_metadata', return_value=True)
+    mocker.patch('autopep723.check_uv_available', return_value=True)
+    mocker.patch('autopep723.has_pep723_metadata', return_value=True)
     mock_run_with_uv = mocker.patch('autopep723.run_with_uv')
 
     script = tmp_path / "test_script.py"
