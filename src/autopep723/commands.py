@@ -32,19 +32,14 @@ def run_script_command(script_path_str: str) -> None:
 
     # Check for existing PEP 723 metadata
     if has_pep723_metadata(script_path):
-        console.print(
-            "[blue]Script already has PEP 723 metadata. "
-            "Using existing dependencies.[/blue]"
-        )
+        console.print("[blue]Script already has PEP 723 metadata. Using existing dependencies.[/blue]")
         run_with_uv(script_path, [])  # Let uv handle dependencies from metadata
     else:
         # Analyze imports and run with detected dependencies
         dependencies = get_third_party_imports(script_path)
 
         if dependencies:
-            console.print(
-                f"[blue]Detected dependencies:[/blue] {', '.join(dependencies)}"
-            )
+            console.print(f"[blue]Detected dependencies:[/blue] {', '.join(dependencies)}")
         else:
             console.print("[blue]No third-party dependencies detected.[/blue]")
 

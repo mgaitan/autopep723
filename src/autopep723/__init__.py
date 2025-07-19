@@ -105,9 +105,7 @@ def get_third_party_imports(file_path: Path) -> list[str]:
     return sorted(set(third_party_imports))
 
 
-def generate_pep723_metadata(
-    dependencies: list[str], python_version: str = ">=3.13"
-) -> str:
+def generate_pep723_metadata(dependencies: list[str], python_version: str = ">=3.13") -> str:
     """Generate PEP 723 metadata block.
 
     Args:
@@ -197,9 +195,7 @@ def run_with_uv(script_path: Path, dependencies: list[str]) -> None:
         console.print(f"[red]Error running script: {e}[/red]")
         sys.exit(1)
     except FileNotFoundError:
-        console.print(
-            "[red]Error: 'uv' command not found. Please install uv first.[/red]"
-        )
+        console.print("[red]Error: 'uv' command not found. Please install uv first.[/red]")
         sys.exit(1)
 
 

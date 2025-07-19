@@ -28,9 +28,7 @@ Shebang usage:
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Check command
-    check_parser = subparsers.add_parser(
-        "check", help="Analyze script and print metadata"
-    )
+    check_parser = subparsers.add_parser("check", help="Analyze script and print metadata")
     check_parser.add_argument("script", help="Path to Python script")
     check_parser.add_argument(
         "--python-version",
@@ -39,9 +37,7 @@ Shebang usage:
     )
 
     # Upgrade command
-    upgrade_parser = subparsers.add_parser(
-        "upgrade", help="Update script with metadata"
-    )
+    upgrade_parser = subparsers.add_parser("upgrade", help="Update script with metadata")
     upgrade_parser.add_argument("script", help="Path to Python script")
     upgrade_parser.add_argument(
         "--python-version",

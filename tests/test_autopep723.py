@@ -406,9 +406,7 @@ def test_import_mapping_no_redundant_entries():
     """Test that import mapping doesn't contain redundant entries."""
     for import_name, package_name in IMPORT_TO_PACKAGE_MAP.items():
         # Import name should be different from package name
-        assert import_name != package_name, (
-            f"Redundant entry: {import_name} -> {package_name}"
-        )
+        assert import_name != package_name, f"Redundant entry: {import_name} -> {package_name}"
 
 
 def test_full_workflow_simple_script(tmp_path):
