@@ -220,7 +220,7 @@ def has_pep723_metadata(script_path: Path) -> bool:
         return False
 
 
-def main() -> None:
+def main() -> None:  # noqa: C901
     """Main entry point for autopep723."""
     parser = argparse.ArgumentParser(
         description="Auto-generate PEP 723 metadata for Python scripts",

@@ -3,6 +3,11 @@ install: ## Install the virtual environment and install the pre-commit hooks
 	@echo "🚀 Creating virtual environment using uv"
 	@uv sync
 
+.PHONY: test
+test: ## Run tests with coverage
+	@echo "🧪 Running tests with coverage"
+	@uv run pytest
+
 .PHONY: release
 release: ## Create a GitHub release for the current version
 	@version=$$(grep -Po '(?<=version = \")([^\"]+)' pyproject.toml); \

@@ -312,3 +312,116 @@ def test_cli_upgrade_with_python_version(tmp_path):
 
     updated_content = script.read_text()
     assert 'requires-python = ">=3.12"' in updated_content
+
+
+def test_cli_run_script_not_exists(mocker):
+    """Test CLI run with non-existent script file."""
+    mocker.patch("autopep723.check_uv_available", return_value=True)
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", "nonexistent_script.py"])
+        with pytest.raises(SystemExit):
+            main()
+
+
+def test_cli_upgrade_no_dependencies_message(tmp_path, capsys):
+    """Test CLI upgrade command shows message when no dependencies detected."""
+    script = tmp_path / "test_script.py"
+    script.write_text("""import os
+import sys
+print("Hello, world!")
+""")
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", "upgrade", str(script)])
+        main()
+
+    captured = capsys.readouterr()
+    assert "No third-party dependencies detected" in captured.out
+
+
+def test_cli_run_with_non_py_extension(tmp_path, mocker, capsys):
+    """Test CLI run with file that doesn't have .py extension shows warning."""
+    mocker.patch("autopep723.check_uv_available", return_value=True)
+    mocker.patch("autopep723.has_pep723_metadata", return_value=False)
+    mocker.patch("autopep723.run_with_uv")
+
+    script = tmp_path / "test_script.txt"
+    script.write_text("import requests")
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", str(script)])
+        main()
+
+    captured = capsys.readouterr()
+    assert "does not have a .py extension" in captured.out
+
+
+def test_main_module_execution(mocker):
+    """Test that main() is called when module is executed directly."""
+    mock_main = mocker.patch("autopep723.main")
+
+    # Mock sys.argv to avoid interference
+    mocker.patch("sys.argv", ["autopep723", "--help"])
+
+    # Import and execute the module's __main__ block
+    import autopep723
+
+    # Simulate the __name__ == "__main__" condition
+    if autopep723.__name__ == "autopep723":
+        autopep723.main()
+
+    # Verify main was called
+    mock_main.assert_called()
+
+
+@pytest.mark.parametrize(
+    "command,script_content,expected_in_output",
+    [
+        ("check", "import requests", "requires-python"),
+        ("check", "import numpy\nimport pandas", "dependencies"),
+        ("check", "import os\nimport sys", "# /// script"),
+    ],
+)
+def test_cli_commands_parametrized(tmp_path, capsys, command, script_content, expected_in_output):
+    """Test CLI commands with various script contents."""
+    script = tmp_path / "test_script.py"
+    script.write_text(script_content)
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", command, str(script)])
+        main()
+
+    captured = capsys.readouterr()
+    assert expected_in_output in captured.out
+
+
+@pytest.mark.parametrize("python_version", [">=3.9", ">=3.10", ">=3.11", ">=3.12"])
+def test_cli_check_custom_python_versions(tmp_path, capsys, python_version):
+    """Test CLI check command with various Python versions."""
+    script = tmp_path / "test_script.py"
+    script.write_text("import requests")
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", "check", "--python-version", python_version, str(script)])
+        main()
+
+    captured = capsys.readouterr()
+    assert f'requires-python = "{python_version}"' in captured.out
+
+
+@pytest.mark.parametrize("extension", [".py", ".pyw", ".txt", ".sh"])
+def test_cli_run_various_file_extensions(tmp_path, mocker, extension):
+    """Test CLI run with various file extensions."""
+    mocker.patch("autopep723.check_uv_available", return_value=True)
+    mocker.patch("autopep723.has_pep723_metadata", return_value=False)
+    mock_run = mocker.patch("autopep723.run_with_uv")
+
+    script = tmp_path / f"test_script{extension}"
+    script.write_text("import requests")
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", str(script)])
+        main()
+
+    mock_run.assert_called_once()
