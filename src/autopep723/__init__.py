@@ -107,9 +107,7 @@ def get_third_party_imports(file_path: Path) -> list[str]:
     return sorted(set(third_party_imports))
 
 
-def generate_pep723_metadata(
-    dependencies: list[str], python_version: str = ">=3.13"
-) -> str:
+def generate_pep723_metadata(dependencies: list[str], python_version: str = ">=3.13") -> str:
     """Generate PEP 723 metadata block.
 
     Args:
@@ -199,9 +197,7 @@ def run_with_uv(script_path: Path, dependencies: list[str]) -> None:
         console.print(f"[red]Error running script: {e}[/red]")
         sys.exit(1)
     except FileNotFoundError:
-        console.print(
-            "[red]Error: 'uv' command not found. Please install uv first.[/red]"
-        )
+        console.print("[red]Error: 'uv' command not found. Please install uv first.[/red]")
         sys.exit(1)
 
 
@@ -239,7 +235,7 @@ Shebang usage:
   #!/usr/bin/env autopep723
   import requests
   print("Hello world!")
-        """
+        """,
     )
 
     parser.add_argument("--version", action="version", version="%(prog)s 1.0.0")
@@ -248,26 +244,14 @@ Shebang usage:
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Check command
-    check_parser = subparsers.add_parser(
-        "check", help="Analyze script and print metadata"
-    )
+    check_parser = subparsers.add_parser("check", help="Analyze script and print metadata")
     check_parser.add_argument("script", help="Path to Python script")
-    check_parser.add_argument(
-        "--python-version",
-        default=">=3.13",
-        help="Required Python version (default: >=3.13)"
-    )
+    check_parser.add_argument("--python-version", default=">=3.13", help="Required Python version (default: >=3.13)")
 
     # Upgrade command
-    upgrade_parser = subparsers.add_parser(
-        "upgrade", help="Update script with metadata"
-    )
+    upgrade_parser = subparsers.add_parser("upgrade", help="Update script with metadata")
     upgrade_parser.add_argument("script", help="Path to Python script")
-    upgrade_parser.add_argument(
-        "--python-version",
-        default=">=3.13",
-        help="Required Python version (default: >=3.13)"
-    )
+    upgrade_parser.add_argument("--python-version", default=">=3.13", help="Required Python version (default: >=3.13)")
 
     return parser
 
@@ -276,9 +260,7 @@ def handle_default_run(script_path: Path) -> None:
     """Handle the default run behavior for a script."""
     # Check if uv is available
     if not check_uv_available():
-        console.print(
-            "[red]Error: 'uv' is not installed or not available in PATH.[/red]"
-        )
+        console.print("[red]Error: 'uv' is not installed or not available in PATH.[/red]")
         console.print("Please install uv: https://github.com/astral-sh/uv")
         sys.exit(1)
 
@@ -348,9 +330,7 @@ def main() -> None:
         sys.exit(1)
 
     # If first argument is not a subcommand, treat it as script to run
-    if len(sys.argv) >= 2 and sys.argv[1] not in [
-        'check', 'upgrade', '--help', '--version', '-h'
-    ]:
+    if len(sys.argv) >= 2 and sys.argv[1] not in ["check", "upgrade", "--help", "--version", "-h"]:
         # Default behavior: run script
         script_path = Path(sys.argv[1])
         handle_default_run(script_path)

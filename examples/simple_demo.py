@@ -29,8 +29,8 @@ def main():
             "PEP 723 metadata generation",
             "Import name mapping",
             "File update capability",
-            "Direct script execution"
-        ]
+            "Direct script execution",
+        ],
     }
 
     # Display the data

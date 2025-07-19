@@ -110,9 +110,9 @@ def test_empty_file(tmp_path):
 def test_generate_metadata_no_dependencies():
     """Test metadata generation with no dependencies."""
     metadata = generate_pep723_metadata([])
-    expected = '''# /// script
+    expected = """# /// script
 # requires-python = ">=3.13"
-# ///'''
+# ///"""
     assert metadata == expected
 
 
@@ -124,7 +124,7 @@ def test_generate_metadata_with_dependencies():
     assert "# /// script" in metadata
     assert "# ///" in metadata
     assert 'requires-python = ">=3.13"' in metadata
-    assert 'dependencies = [' in metadata
+    assert "dependencies = [" in metadata
     assert '"requests"' in metadata
     assert '"flask"' in metadata
     assert '"numpy"' in metadata
@@ -141,39 +141,39 @@ def test_generate_metadata_single_dependency():
     """Test metadata generation with single dependency."""
     deps = ["requests"]
     metadata = generate_pep723_metadata(deps)
-    expected = '''# /// script
+    expected = """# /// script
 # requires-python = ">=3.13"
 # dependencies = [
 #     "requests",
 # ]
-# ///'''
+# ///"""
     assert metadata == expected
 
 
 def test_has_existing_metadata_true():
     """Test detection of existing metadata."""
-    content = '''#!/usr/bin/env python3
+    content = """#!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.13"
 # dependencies = ["requests"]
 # ///
 
 import requests
-'''
+"""
     assert has_existing_metadata(content) is True
 
 
 def test_has_existing_metadata_false():
     """Test detection when no metadata exists."""
-    content = '''#!/usr/bin/env python3
+    content = """#!/usr/bin/env python3
 import requests
-'''
+"""
     assert has_existing_metadata(content) is False
 
 
 def test_extract_existing_metadata():
     """Test extraction of existing metadata."""
-    content = '''#!/usr/bin/env python3
+    content = """#!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.13"
 # dependencies = ["requests"]
@@ -181,13 +181,13 @@ def test_extract_existing_metadata():
 
 import requests
 print("Hello")
-'''
+"""
     before, metadata, after = extract_existing_metadata(content)
 
     assert before == "#!/usr/bin/env python3\n"
     assert "# /// script" in metadata
     assert "# ///" in metadata
-    assert after == "\nimport requests\nprint(\"Hello\")\n"
+    assert after == '\nimport requests\nprint("Hello")\n'
 
 
 def test_extract_no_existing_metadata():
@@ -203,15 +203,15 @@ def test_extract_no_existing_metadata():
 def test_update_file_new_metadata(tmp_path):
     """Test updating file with new metadata."""
     script = tmp_path / "test_script.py"
-    original_content = '''import requests
+    original_content = """import requests
 print("Hello")
-'''
+"""
     script.write_text(original_content)
 
-    metadata = '''# /// script
+    metadata = """# /// script
 # requires-python = ">=3.13"
 # dependencies = ["requests"]
-# ///'''
+# ///"""
 
     update_file_with_metadata(script, metadata)
 
@@ -224,16 +224,16 @@ print("Hello")
 def test_update_file_with_shebang(tmp_path):
     """Test updating file that has shebang."""
     script = tmp_path / "test_script.py"
-    original_content = '''#!/usr/bin/env python3
+    original_content = """#!/usr/bin/env python3
 import requests
 print("Hello")
-'''
+"""
     script.write_text(original_content)
 
-    metadata = '''# /// script
+    metadata = """# /// script
 # requires-python = ">=3.13"
 # dependencies = ["requests"]
-# ///'''
+# ///"""
 
     update_file_with_metadata(script, metadata)
 
@@ -246,7 +246,7 @@ print("Hello")
 def test_update_file_replace_existing_metadata(tmp_path):
     """Test updating file that already has metadata."""
     script = tmp_path / "test_script.py"
-    original_content = '''#!/usr/bin/env python3
+    original_content = """#!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.11"
 # dependencies = ["flask"]
@@ -254,13 +254,13 @@ def test_update_file_replace_existing_metadata(tmp_path):
 
 import requests
 print("Hello")
-'''
+"""
     script.write_text(original_content)
 
-    new_metadata = '''# /// script
+    new_metadata = """# /// script
 # requires-python = ">=3.13"
 # dependencies = ["requests", "numpy"]
-# ///'''
+# ///"""
 
     update_file_with_metadata(script, new_metadata)
 
@@ -274,7 +274,7 @@ print("Hello")
 
 def test_run_with_uv_success(mocker):
     """Test successful uv run execution."""
-    mock_subprocess = mocker.patch('autopep723.subprocess.run')
+    mock_subprocess = mocker.patch("autopep723.subprocess.run")
     mock_subprocess.return_value.returncode = 0
 
     script_path = Path("test_script.py")
@@ -282,18 +282,13 @@ def test_run_with_uv_success(mocker):
 
     run_with_uv(script_path, dependencies)
 
-    expected_cmd = [
-        "uv", "run",
-        "--with", "requests",
-        "--with", "numpy",
-        "test_script.py"
-    ]
+    expected_cmd = ["uv", "run", "--with", "requests", "--with", "numpy", "test_script.py"]
     mock_subprocess.assert_called_once_with(expected_cmd, check=True)
 
 
 def test_run_with_uv_no_dependencies(mocker):
     """Test uv run with no dependencies."""
-    mock_subprocess = mocker.patch('autopep723.subprocess.run')
+    mock_subprocess = mocker.patch("autopep723.subprocess.run")
     mock_subprocess.return_value.returncode = 0
 
     script_path = Path("test_script.py")
@@ -308,7 +303,8 @@ def test_run_with_uv_no_dependencies(mocker):
 def test_run_with_uv_command_error(mocker):
     """Test uv run with command error."""
     from subprocess import CalledProcessError
-    mock_subprocess = mocker.patch('autopep723.subprocess.run')
+
+    mock_subprocess = mocker.patch("autopep723.subprocess.run")
     mock_subprocess.side_effect = CalledProcessError(1, "uv")
 
     script_path = Path("test_script.py")
@@ -320,7 +316,7 @@ def test_run_with_uv_command_error(mocker):
 
 def test_run_with_uv_not_found(mocker):
     """Test uv run when uv is not installed."""
-    mock_subprocess = mocker.patch('autopep723.subprocess.run')
+    mock_subprocess = mocker.patch("autopep723.subprocess.run")
     mock_subprocess.side_effect = FileNotFoundError()
 
     script_path = Path("test_script.py")
@@ -332,7 +328,7 @@ def test_run_with_uv_not_found(mocker):
 
 def test_check_uv_available_true(mocker):
     """Test check_uv_available when uv is available."""
-    mock_subprocess = mocker.patch('autopep723.subprocess.run')
+    mock_subprocess = mocker.patch("autopep723.subprocess.run")
     mock_subprocess.return_value.returncode = 0
 
     assert check_uv_available() is True
@@ -340,7 +336,7 @@ def test_check_uv_available_true(mocker):
 
 def test_check_uv_available_false_not_found(mocker):
     """Test check_uv_available when uv is not found."""
-    mock_subprocess = mocker.patch('autopep723.subprocess.run')
+    mock_subprocess = mocker.patch("autopep723.subprocess.run")
     mock_subprocess.side_effect = FileNotFoundError()
 
     assert check_uv_available() is False
@@ -349,7 +345,8 @@ def test_check_uv_available_false_not_found(mocker):
 def test_check_uv_available_false_error(mocker):
     """Test check_uv_available when uv returns error."""
     from subprocess import CalledProcessError
-    mock_subprocess = mocker.patch('autopep723.subprocess.run')
+
+    mock_subprocess = mocker.patch("autopep723.subprocess.run")
     mock_subprocess.side_effect = CalledProcessError(1, "uv")
 
     assert check_uv_available() is False
@@ -358,11 +355,11 @@ def test_check_uv_available_false_error(mocker):
 def test_has_pep723_metadata_true(tmp_path):
     """Test has_pep723_metadata with script that has metadata."""
     script = tmp_path / "test_script.py"
-    content = '''# /// script
+    content = """# /// script
 # requires-python = ">=3.13"
 # dependencies = ["requests"]
 # ///
-import requests'''
+import requests"""
     script.write_text(content)
 
     assert has_pep723_metadata(script) is True
@@ -407,7 +404,7 @@ def test_import_mapping_no_redundant_entries():
 def test_full_workflow_simple_script(tmp_path):
     """Test the complete workflow with a simple script."""
     script = tmp_path / "test_script.py"
-    script_content = '''#!/usr/bin/env python3
+    script_content = """#!/usr/bin/env python3
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -415,7 +412,7 @@ from bs4 import BeautifulSoup
 response = requests.get("https://example.com")
 soup = BeautifulSoup(response.content, 'html.parser')
 print(soup.title)
-'''
+"""
     script.write_text(script_content)
 
     # Get imports
@@ -443,7 +440,7 @@ print(soup.title)
 def test_workflow_with_existing_metadata(tmp_path):
     """Test workflow when script already has metadata."""
     script = tmp_path / "test_script.py"
-    script_content = '''#!/usr/bin/env python3
+    script_content = """#!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.11"
 # dependencies = ["flask"]
@@ -451,7 +448,7 @@ def test_workflow_with_existing_metadata(tmp_path):
 
 import requests
 import numpy as np
-'''
+"""
     script.write_text(script_content)
 
     # Get imports
