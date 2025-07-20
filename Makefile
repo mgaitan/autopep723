@@ -14,6 +14,11 @@ release: ## Create a GitHub release for the current version
 	echo "🚀 Creating release for version $$version".; \
 	gh release create "$$version" --generate-notes
 
+.PHONY: docs
+docs:
+	@echo "📖 Building documentation"
+	@uv run --group docs sphinx-build docs docs/_build/html -b html -W
+
 .PHONY: help
 help:
 	@uv run python -c "import re; \
