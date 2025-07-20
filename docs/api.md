@@ -51,15 +51,7 @@ Display version information and exit.
 #### `--help`
 Show help message and exit.
 
-## How It Works
 
-The tool follows this process:
-
-1. **Parse** the Python script using AST to extract import statements
-2. **Filter** out built-in and standard library modules  
-3. **Map** import names to package names using built-in mappings
-4. **Generate** PEP 723 compliant metadata with detected dependencies
-5. **Execute** using `uv run` with the appropriate `--with` flags
 
 ## Import Name Mappings
 

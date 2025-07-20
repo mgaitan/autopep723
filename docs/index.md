@@ -39,6 +39,7 @@ import numpy as np
 
 usage
 examples
+how-it-works
 api
 contributing
 ```
