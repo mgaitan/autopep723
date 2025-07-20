@@ -22,7 +22,7 @@ This is a minimal wrapper around `uv run`. Be very thoughtful about proposing ne
 - Avoid adding heavy dependencies for minor features
 
 ### AI Assistance
-AI assistance is encouraged! This project is ~100% AI-generated, but contributions must still meet all quality standards regardless of how they were created.
+AI assistance is welcome alongside manual contributions! This project was largely AI-assisted (using [Zed](https://zed.dev/) with [Claude Sonnet 3.5](https://www.anthropic.com/claude) and [Gemini Flash 2.0](https://deepmind.google/technologies/gemini/flash/)), but all contributions must meet quality standards regardless of how they were created.
 
 ## Development Setup
 
@@ -111,6 +111,11 @@ Update documentation when making changes:
 ## Code of Conduct
 
 We follow a zero-tolerance policy for harassment of any kind. Be respectful and inclusive in all interactions.
+
+## Other Ways to Contribute
+
+### Review Pull Requests
+Reviewing PRs is a valuable way to contribute! Look for open pull requests and provide constructive feedback on code quality, testing, and documentation.
 
 ## Questions?
 
