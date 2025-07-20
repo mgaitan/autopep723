@@ -24,7 +24,7 @@ autopep723 script.py
 Make your scripts executable with automatic dependency management:
 
 ```python
-#!/usr/bin/env uvx autopep723
+#!/usr/bin/env -S uvx autopep723
 import requests
 import numpy as np
 
