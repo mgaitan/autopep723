@@ -114,11 +114,13 @@ When you run `uvx autopep723`:
 
 ### Unix/Linux/macOS
 
-The shebang `#!/usr/bin/env uvx autopep723` works by:
+The shebang `#!/usr/bin/env -S uvx autopep723` works by:
 
 1. **Shell interpretation**: Shell reads the shebang line
 2. **Command execution**: Runs `uvx autopep723 script.py`
 3. **File as argument**: The script file becomes the argument
+
+**Note**: The `-S` flag is required for `env` to properly handle arguments with spaces. This flag is available in most modern Unix systems (GNU coreutils 8.30+, macOS 10.15+). For older systems, consider using permanent installation with `uv tool install autopep723` and the simpler shebang `#!/usr/bin/env autopep723`.
 
 ### Windows Compatibility
 

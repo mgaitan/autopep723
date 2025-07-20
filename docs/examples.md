@@ -69,7 +69,7 @@ The shebang `#!/usr/bin/env autopep723` automatically:
 
 For `uvx` usage, change the shebang to:
 ```python
-#!/usr/bin/env uvx autopep723
+#!/usr/bin/env -S uvx autopep723
 ```
 
 ## Machine Learning Analysis

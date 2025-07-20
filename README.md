@@ -38,12 +38,14 @@ autopep723 upgrade script.py
 You can use `autopep723` directly as a shebang:
 
 ```python
-#!/usr/bin/env uvx autopep723
+#!/usr/bin/env -S uvx autopep723
 import requests
 import numpy as np
 
 # Your script here...
 ```
+
+**Note**: The `-S` flag is required for `env` to properly handle arguments with spaces. Without it, you'll get an error like `No such file or directory`.
 
 This allows scripts to be executable without explicitly declaring dependencies. The tool detects imports and runs the script using `uv run` with the required packages installed on-the-fly in an ephemeral environment.
 

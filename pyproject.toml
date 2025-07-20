@@ -1,6 +1,6 @@
 [project]
 name = "autopep723"
-version = "0.1.0"
+version = "0.1.1"
 description = "Auto-generate PEP 723 metadata for Python scripts by analyzing imports"
 readme = "README.md"
 authors = [{ name = "Martín Gaitán", email = "gaitan@gmail.com" }]

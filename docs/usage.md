@@ -104,7 +104,7 @@ autopep723 --help
 Make scripts executable with automatic dependency management:
 
 ```python
-#!/usr/bin/env uvx autopep723
+#!/usr/bin/env -S uvx autopep723
 import requests
 import pandas as pd
 
@@ -112,6 +112,8 @@ response = requests.get("https://api.example.com/data")
 df = pd.DataFrame(response.json())
 print(df.head())
 ```
+
+**Note**: The `-S` flag is required for `env` to properly handle arguments with spaces. Without it, you'll get an error like `No such file or directory`.
 
 Make the script executable and run it:
 
@@ -149,6 +151,8 @@ Then use:
 ```python
 #!/usr/bin/env autopep723
 ```
+
+This doesn't require the `-S` flag since there are no arguments to pass.
 
 ## Import Name Mapping
 
