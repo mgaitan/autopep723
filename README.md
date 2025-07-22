@@ -35,11 +35,13 @@ import numpy as np
 
 ```bash
 # Add/update PEP 723 metadata in the script
-autopep723 upgrade script.py
+autopep723 add script.py
 
 # Check what metadata would be generated
 autopep723 check script.py
 ```
+
+The `add` command is analogous to `uv add --script script.py 'dep1' 'dep2'`, but with automatic dependency detection - you don't need to manually specify which packages to add.
 
 
 ## Features

@@ -29,7 +29,7 @@ Analyze script and print PEP 723 metadata to stdout.
 autopep723 check --python-version ">=3.11" script.py
 ```
 
-#### `autopep723 upgrade [OPTIONS] SCRIPT`
+#### `autopep723 add [OPTIONS] SCRIPT`
 Update script file with PEP 723 metadata in-place.
 
 **Arguments:**
@@ -40,7 +40,7 @@ Update script file with PEP 723 metadata in-place.
 
 **Example:**
 ```bash
-autopep723 upgrade --python-version ">=3.12" script.py
+autopep723 add --python-version ">=3.12" script.py
 ```
 
 ### Global Options

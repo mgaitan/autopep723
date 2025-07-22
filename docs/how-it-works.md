@@ -49,13 +49,15 @@ When you execute `autopep723 check script.py`:
 2. **Metadata Generation**: Creates PEP 723 format
 3. **Output**: Prints metadata to stdout (no execution)
 
-### Upgrade Mode
+### Add Mode
 
-When you execute `autopep723 upgrade script.py`:
+When you execute `autopep723 add script.py`:
 
 1. **Script Analysis**: Same parsing process
 2. **File Modification**: Adds metadata block to top of file
 3. **Safety Check**: Skips if metadata already exists
+
+The `add` command is analogous to `uv add --script script.py 'dep1' 'dep2'`, but with automatic dependency detection - you don't need to manually specify which packages to add.
 
 ## Import Analysis Process
 
