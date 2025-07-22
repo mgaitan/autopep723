@@ -6,6 +6,7 @@ import tempfile
 import urllib.parse
 import urllib.request
 from pathlib import Path
+from typing import Optional
 
 from .logger import command, error, verbose
 
@@ -179,7 +180,7 @@ def update_file_with_metadata(file_path: Path, metadata: str) -> None:
     file_path.write_text(new_content, encoding="utf-8")
 
 
-def run_with_uv(script_path: Path, dependencies: list[str], script_args: list[str] | None = None) -> None:
+def run_with_uv(script_path: Path, dependencies: list[str], script_args: Optional[list[str]] = None) -> None:
     """Run the script using uv run with dependencies and script arguments."""
     if script_args is None:
         script_args = []

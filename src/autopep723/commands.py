@@ -1,5 +1,7 @@
 """Commands module for autopep723 - handles different command implementations."""
 
+from typing import Optional
+
 from . import (
     generate_pep723_metadata,
     get_third_party_imports,
@@ -12,7 +14,7 @@ from .logger import success, verbose, warning
 from .validation import validate_script_input, validate_uv_available
 
 
-def run_script_command(script_input: str, script_args: list[str] | None = None) -> None:
+def run_script_command(script_input: str, script_args: Optional[list[str]] = None) -> None:
     """Handle the default script execution command.
 
     Args:
