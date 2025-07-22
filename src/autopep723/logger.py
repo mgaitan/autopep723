@@ -48,10 +48,17 @@ def init_logger(verbose: bool = False, use_colors: bool = True) -> None:
     for handler in logger.handlers[:]:
         logger.removeHandler(handler)
 
-    # Add console handler
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(ColoredFormatter(use_colors))
-    logger.addHandler(handler)
+    # Add stdout handler for info/debug/success
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    stdout_handler.setFormatter(ColoredFormatter(use_colors))
+    stdout_handler.addFilter(lambda record: record.levelno < logging.WARNING)
+    logger.addHandler(stdout_handler)
+
+    # Add stderr handler for warnings/errors
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    stderr_handler.setFormatter(ColoredFormatter(use_colors))
+    stderr_handler.addFilter(lambda record: record.levelno >= logging.WARNING)
+    logger.addHandler(stderr_handler)
 
     # Set level
     logger.setLevel(logging.DEBUG if verbose else logging.INFO)

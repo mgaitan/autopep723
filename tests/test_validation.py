@@ -42,15 +42,14 @@ def test_check_script_extension_py_file(tmp_path, capsys):
     assert captured.out == ""
 
 
-def test_check_script_extension_non_py_file(tmp_path, capsys):
+def test_check_script_extension_non_py_file(tmp_path, caplog):
     """Test check_script_extension with non-.py file (shows warning)."""
     script = tmp_path / "test_script.txt"
     script.write_text("print('hello')")
 
     check_script_extension(script)
 
-    captured = capsys.readouterr()
-    assert "does not have a .py extension" in captured.err
+    assert "does not have a .py extension" in caplog.text
 
 
 def test_check_uv_available_true(mocker):
@@ -106,15 +105,14 @@ def test_validate_and_prepare_script_success(tmp_path, mocker):
     validate_and_prepare_script(script)
 
 
-def test_validate_and_prepare_script_non_py_warning(tmp_path, capsys):
-    """Test validate_and_prepare_script with non-.py file shows warning."""
+def test_validate_and_prepare_script_non_py_warning(tmp_path, caplog):
+    """Test validate_and_prepare_script with non-.py file (shows warning)."""
     script = tmp_path / "test_script.txt"
     script.write_text("print('hello')")
 
     validate_and_prepare_script(script)
 
-    captured = capsys.readouterr()
-    assert "does not have a .py extension" in captured.err
+    assert "does not have a .py extension" in caplog.text
 
 
 def test_validate_and_prepare_script_nonexistent(tmp_path):
@@ -132,41 +130,39 @@ def test_validate_and_prepare_script_nonexistent(tmp_path):
         (".txt", True),
     ],
 )
-def test_check_script_extension_parametrized(tmp_path, capsys, extension, should_warn):
-    """Test check_script_extension with various extensions."""
+def test_check_script_extension_parametrized(tmp_path, extension, should_warn, caplog):
+    """Test check_script_extension with various file extensions."""
     script = tmp_path / f"test_script{extension}"
     script.write_text("print('hello')")
 
     check_script_extension(script)
 
-    captured = capsys.readouterr()
     if should_warn:
-        assert "does not have a .py extension" in captured.err
+        assert "does not have a .py extension" in caplog.text
     else:
-        assert captured.out == ""
+        assert caplog.text == ""
 
 
-def test_validate_uv_available_error_messages(mocker, capsys):
-    """Test validate_uv_available error messages."""
+def test_validate_uv_available_error_messages(mocker, caplog):
+    """Test validate_uv_available shows proper error messages."""
+    # Mock check_uv_available to return False
     mocker.patch("autopep723.validation.check_uv_available", return_value=False)
 
     with pytest.raises(SystemExit):
         validate_uv_available()
 
-    captured = capsys.readouterr()
-    assert "'uv' is not installed or not available in PATH" in captured.err
-    assert "Please install uv: https://github.com/astral-sh/uv" in captured.err
+    assert "'uv' is not installed or not available in PATH" in caplog.text
+    assert "Please install uv: https://github.com/astral-sh/uv" in caplog.text
 
 
-def test_validate_script_exists_error_message(tmp_path, capsys):
+def test_validate_script_exists_error_message(tmp_path, caplog):
     """Test validate_script_exists error message."""
     script = tmp_path / "nonexistent.py"
 
     with pytest.raises(SystemExit):
         validate_script_exists(script)
 
-    captured = capsys.readouterr()
-    assert "does not exist" in captured.err
+    assert "does not exist" in caplog.text
 
 
 def test_validate_script_input_url():
