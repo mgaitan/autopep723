@@ -65,7 +65,7 @@ Update a script file to include PEP 723 metadata:
 autopep723 add script.py
 ```
 
-This modifies the file in-place, adding the metadata block at the top.
+This modifies the file in-place, adding the metadata block at the top. The `add` command is analogous to `uv add --script script.py 'dep1' 'dep2'`, but with automatic dependency detection - you don't need to manually specify which packages to add.
 
 ## Options
 

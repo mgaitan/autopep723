@@ -57,6 +57,8 @@ When you execute `autopep723 add script.py`:
 2. **File Modification**: Adds metadata block to top of file
 3. **Safety Check**: Skips if metadata already exists
 
+The `add` command is analogous to `uv add --script script.py 'dep1' 'dep2'`, but with automatic dependency detection - you don't need to manually specify which packages to add.
+
 ## Import Analysis Process
 
 ```{mermaid}
