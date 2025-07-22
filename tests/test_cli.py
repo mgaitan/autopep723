@@ -577,3 +577,24 @@ def test_get_script_args_from_args():
         mp.setattr(sys, "argv", ["autopep723", "--verbose", "script.py", "arg1", "arg2"])
         args = get_script_args_from_args()
         assert args == ["arg1", "arg2"]
+
+
+def test_run_script_command_with_none_script_args(tmp_path, mocker):
+    """Test run_script_command with script_args=None to cover the None branch."""
+    mocker.patch("autopep723.validation.check_uv_available", return_value=True)
+    mock_run_with_uv = mocker.patch("autopep723.commands.run_with_uv")
+
+    script = tmp_path / "test_script.py"
+    script.write_text("import requests")
+
+    # Call run_script_command with explicit script_args=None
+    from autopep723.commands import run_script_command
+
+    run_script_command(str(script), script_args=None)
+
+    # Verify run_with_uv was called with empty list for script_args
+    mock_run_with_uv.assert_called_once()
+    args = mock_run_with_uv.call_args[0]
+    script_path, dependencies, script_args = args
+    assert str(script_path) == str(script)
+    assert script_args == []
