@@ -179,8 +179,10 @@ def update_file_with_metadata(file_path: Path, metadata: str) -> None:
     file_path.write_text(new_content, encoding="utf-8")
 
 
-def run_with_uv(script_path: Path, dependencies: list[str]) -> None:
-    """Run the script using uv run with dependencies."""
+def run_with_uv(script_path: Path, dependencies: list[str], script_args: list[str] | None = None) -> None:
+    """Run the script using uv run with dependencies and script arguments."""
+    if script_args is None:
+        script_args = []
 
     cmd = ["uv", "run"]
 
@@ -188,6 +190,9 @@ def run_with_uv(script_path: Path, dependencies: list[str]) -> None:
         cmd.extend(["--with", dep])
 
     cmd.append(str(script_path))
+
+    # Add script arguments after the script path
+    cmd.extend(script_args)
 
     command(" ".join(cmd))
 
@@ -296,6 +301,7 @@ def main() -> None:
     """Main entry point for autopep723."""
     from .cli import (
         create_parser,
+        get_script_args_from_args,
         get_script_path_from_args,
         is_default_run_command,
         should_show_help,
@@ -322,7 +328,8 @@ def main() -> None:
             init_logger(verbose=True)
 
         script_path = get_script_path_from_args()
-        run_script_command(script_path)
+        script_args = get_script_args_from_args()
+        run_script_command(script_path, script_args)
         return
 
     # Handle subcommands

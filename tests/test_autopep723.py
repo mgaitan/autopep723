@@ -362,6 +362,92 @@ def test_run_with_uv_not_found(mocker):
         run_with_uv(script_path, dependencies)
 
 
+def test_run_with_uv_with_script_args(mocker):
+    """Test uv run with script arguments."""
+    mock_subprocess = mocker.patch("autopep723.subprocess.run")
+    mock_subprocess.return_value.returncode = 0
+
+    script_path = Path("test_script.py")
+    dependencies = ["requests"]
+    script_args = ["arg1", "arg2", "--flag"]
+
+    run_with_uv(script_path, dependencies, script_args)
+
+    expected_cmd = [
+        "uv",
+        "run",
+        "--with",
+        "requests",
+        "test_script.py",
+        "arg1",
+        "arg2",
+        "--flag",
+    ]
+    mock_subprocess.assert_called_once_with(expected_cmd, check=True)
+
+
+def test_run_with_uv_no_dependencies_with_script_args(mocker):
+    """Test uv run with no dependencies but with script arguments."""
+    mock_subprocess = mocker.patch("autopep723.subprocess.run")
+    mock_subprocess.return_value.returncode = 0
+
+    script_path = Path("test_script.py")
+    dependencies = []
+    script_args = ["--config", "file.json", "input.txt"]
+
+    run_with_uv(script_path, dependencies, script_args)
+
+    expected_cmd = ["uv", "run", "test_script.py", "--config", "file.json", "input.txt"]
+    mock_subprocess.assert_called_once_with(expected_cmd, check=True)
+
+
+def test_run_with_uv_with_complex_script_args(mocker):
+    """Test uv run with complex script arguments including spaces."""
+    mock_subprocess = mocker.patch("autopep723.subprocess.run")
+    mock_subprocess.return_value.returncode = 0
+
+    script_path = Path("test_script.py")
+    dependencies = ["numpy", "pandas"]
+    script_args = ["arg with spaces", "123", "--output=/path/to/file"]
+
+    run_with_uv(script_path, dependencies, script_args)
+
+    expected_cmd = [
+        "uv",
+        "run",
+        "--with",
+        "numpy",
+        "--with",
+        "pandas",
+        "test_script.py",
+        "arg with spaces",
+        "123",
+        "--output=/path/to/file",
+    ]
+    mock_subprocess.assert_called_once_with(expected_cmd, check=True)
+
+
+def test_run_with_uv_empty_script_args(mocker):
+    """Test uv run with explicitly empty script arguments."""
+    mock_subprocess = mocker.patch("autopep723.subprocess.run")
+    mock_subprocess.return_value.returncode = 0
+
+    script_path = Path("test_script.py")
+    dependencies = ["requests"]
+    script_args = []
+
+    run_with_uv(script_path, dependencies, script_args)
+
+    expected_cmd = [
+        "uv",
+        "run",
+        "--with",
+        "requests",
+        "test_script.py",
+    ]
+    mock_subprocess.assert_called_once_with(expected_cmd, check=True)
+
+
 def test_check_uv_available_true(mocker):
     """Test check_uv_available when uv is available."""
     mock_subprocess = mocker.patch("autopep723.subprocess.run")

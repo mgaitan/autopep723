@@ -12,12 +12,15 @@ from .logger import success, verbose, warning
 from .validation import validate_script_input, validate_uv_available
 
 
-def run_script_command(script_input: str) -> None:
+def run_script_command(script_input: str, script_args: list[str] | None = None) -> None:
     """Handle the default script execution command.
 
     Args:
         script_input: Path to the script or URL as string
+        script_args: Additional arguments to pass to the script
     """
+    if script_args is None:
+        script_args = []
 
     # Validate prerequisites
     validate_uv_available()
@@ -29,7 +32,7 @@ def run_script_command(script_input: str) -> None:
     # Check for existing PEP 723 metadata
     if has_pep723_metadata(script_path):
         verbose("Script already has PEP 723 metadata. Using existing dependencies.")
-        run_with_uv(script_path, [])  # Let uv handle dependencies from metadata
+        run_with_uv(script_path, [], script_args)  # Let uv handle dependencies from metadata
     else:
         # Analyze imports and run with detected dependencies
         dependencies = get_third_party_imports(script_path)
@@ -39,7 +42,7 @@ def run_script_command(script_input: str) -> None:
         else:
             verbose("✨ No third-party dependencies detected")
 
-        run_with_uv(script_path, dependencies)
+        run_with_uv(script_path, dependencies, script_args)
 
 
 def check_command(script_input: str, python_version: str) -> None:
