@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+from importlib.metadata import version
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -23,7 +24,12 @@ Shebang usage:
         """,
     )
 
-    parser.add_argument("--version", action="version", version="%(prog)s 1.0.0")
+    try:
+        package_version = version("autopep723")
+    except Exception:
+        package_version = "unknown"
+
+    parser.add_argument("--version", action="version", version=f"%(prog)s {package_version}")
     parser.add_argument(
         "-v", "--verbose", action="store_true", help="Show verbose output including download progress and commands"
     )

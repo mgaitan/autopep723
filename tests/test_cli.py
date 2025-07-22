@@ -175,15 +175,32 @@ def test_cli_help_message(capsys):
     assert "Examples:" in captured.out
 
 
-def test_cli_version_message(capsys):
+def test_cli_version_message(capsys, mocker):
     """Test CLI version message."""
+    # Mock at the module level where it's imported
+    mock_version = mocker.patch("autopep723.cli.version", return_value="1.2.3")
+
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(sys, "argv", ["autopep723", "--version"])
         with pytest.raises(SystemExit):
             main()
 
     captured = capsys.readouterr()
-    assert "1.0.0" in captured.out
+    assert "autopep723 1.2.3" in captured.out
+    mock_version.assert_called_once_with("autopep723")
+
+
+def test_cli_version_message_exception(capsys, mocker):
+    """Test CLI version message with exception fallback."""
+    mocker.patch("autopep723.cli.version", side_effect=Exception("Package not found"))
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", "--version"])
+        with pytest.raises(SystemExit):
+            main()
+
+    captured = capsys.readouterr()
+    assert "autopep723 unknown" in captured.out
 
 
 def test_cli_add_with_existing_metadata(tmp_path):
