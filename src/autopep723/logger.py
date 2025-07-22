@@ -89,4 +89,4 @@ def verbose(msg: str) -> None:
 
 
 def command(msg: str) -> None:
-    get_logger().log(35, f"🚀 Running: {msg}")
+    get_logger().debug(f"🚀 Running: {msg}")
