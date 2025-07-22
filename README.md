@@ -1,36 +1,21 @@
 # autopep723
 
-A **zero-dependency** CLI tool that automatically generates [PEP 723](https://peps.python.org/pep-0723/) metadata for Python scripts by analyzing their imports and dependencies.
+A **zero-dependency** CLI tool that dynamically generates [PEP 723](https://peps.python.org/pep-0723/) metadata for Python scripts by analyzing their imports. Forget about manually managing dependencies for simple scripts!
 
-## What it does
-
-`autopep723` parses Python scripts to detect third-party package imports and generates the appropriate PEP 723 inline script metadata. This metadata allows tools like `uv run` to automatically install and manage dependencies when executing scripts.
-
-## Installation
-
-You can run the tool directly using `uvx`:
+Simply run your script via `autopep723`:
 
 ```bash
-uvx autopep723
+# Run directly without installing
+uvx autopep723 script.py
 ```
+
+`autopep723` analyzes scripts (statically, using `ast`) to detect third-party imports and generates PEP 723 inline script metadata to pass to `uv run`.
 
 To install it permanently:
 
 ```bash
 uv tool install autopep723
-```
-
-## Quick Start
-
-```bash
-# Run script with automatically detected dependencies
 autopep723 script.py
-
-# Print PEP 723 metadata to stdout  
-autopep723 check script.py
-
-# Update the script file with metadata
-autopep723 upgrade script.py
 ```
 
 ## Shebang Integration
@@ -45,43 +30,27 @@ import numpy as np
 # Your script here...
 ```
 
-**Note**: The `-S` flag is required for `env` to properly handle arguments with spaces. Without it, you'll get an error like `No such file or directory`.
+**Note**: The `-S` flag is required for `env` to properly handle arguments with spaces.
 
-This allows scripts to be executable without explicitly declaring dependencies. The tool detects imports and runs the script using `uv run` with the required packages installed on-the-fly in an ephemeral environment.
+## Commands
+
+```bash
+# Check what metadata would be generated
+autopep723 check script.py
+
+# Add/update PEP 723 metadata in the script
+autopep723 upgrade script.py
+```
+
 
 ## Features
 
-- 🔍 **Automatic dependency detection** via AST analysis
-- 📦 **Import name mapping** (e.g., `import PIL` → `pillow`)  
-- 🚀 **Multiple output modes** (print, update, or run)
-- ✅ **PEP 723 compliant** metadata generation
-- 🛡️ **Built-in module filtering** excludes standard library
-- 🔧 **Graceful error handling** for syntax errors
 - ⚡ **Zero dependencies** - uses only Python standard library
-- 🪶 **Minimal footprint** - perfect for use as a `uv run` wrapper
+- 🪶 **Minimal footprint** - perfect as `uv run` wrapper
+- 🔍 **Automatic dependency detection** via AST analysis
+- ✅ **PEP 723 compliant** metadata generation
 
-## Documentation
-
-For detailed usage, examples, and API reference, see the [full documentation](https://autopep723.readthedocs.io/).
-
-## Related
-
-- [PEP 723](https://peps.python.org/pep-0723/) - Inline script metadata specification
-- [uv tools guide](https://docs.astral.sh/uv/guides/tools/) - Using uv for tool management
-- [uv issue #6283](https://github.com/astral-sh/uv/issues/6283) - Autodetect dependencies mode proposal
-
-## Contributing
-
-Pull requests are welcome! 🎉
-
-- **One change per PR** - Keep it focused
-- **Tests required** - Maintain coverage standards  
-- **Follow conventions** - Use pytest and pytest-mock
-- **Be thoughtful** - This is a minimal, zero-dependency wrapper
-
-AI assistance is encouraged (this project is ~100% AI-generated), but contributions must meet quality standards.
-
-We follow a zero-tolerance policy for harassment of any kind. Be respectful and inclusive.
+For detailed usage see the [documentation](https://autopep723.readthedocs.io/).
 
 ## License
 
