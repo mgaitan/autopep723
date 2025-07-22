@@ -183,7 +183,7 @@ def update_file_with_metadata(file_path: Path, metadata: str) -> None:
 
 def run_with_uv(script_path: Path, dependencies: list[str]) -> None:
     """Run the script using uv run with dependencies."""
-    from .logger import command, error, verbose
+    from .logger import command, error
 
     cmd = ["uv", "run"]
 
@@ -196,10 +196,6 @@ def run_with_uv(script_path: Path, dependencies: list[str]) -> None:
 
     try:
         subprocess.run(cmd, check=True)
-        if dependencies:
-            verbose(f"✓ Script executed successfully with {len(dependencies)} dependencies")
-        else:
-            verbose("✓ Script executed successfully")
     except subprocess.CalledProcessError as e:
         if e.returncode != 0:
             error(f"Script execution failed with exit code {e.returncode}")
