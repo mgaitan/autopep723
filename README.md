@@ -30,16 +30,15 @@ import numpy as np
 # Your script here...
 ```
 
-**Note**: The `-S` flag is required for `env` to properly handle arguments with spaces.
 
 ## Commands
 
 ```bash
-# Check what metadata would be generated
-autopep723 check script.py
-
 # Add/update PEP 723 metadata in the script
 autopep723 upgrade script.py
+
+# Check what metadata would be generated
+autopep723 check script.py
 ```
 
 

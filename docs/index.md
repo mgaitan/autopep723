@@ -1,10 +1,8 @@
 # autopep723
 
-A **zero-dependency** CLI tool that automatically generates [PEP 723](https://peps.python.org/pep-0723/) metadata for Python scripts by analyzing their imports and dependencies.
+A CLI tool that dynamically generates [PEP 723](https://peps.python.org/pep-0723/) metadata for Python scripts by analyzing their imports and dependencies. Just run your script with `autopep723`:
 
 ## Quick Start
-
-Install and run with `uv`:
 
 ```bash
 # Run directly without installing
@@ -14,8 +12,6 @@ uvx autopep723 script.py
 uv tool install autopep723
 autopep723 script.py
 ```
-
-## What it does
 
 `autopep723` analyzes Python scripts to detect third-party imports and generates PEP 723 inline script metadata. This enables tools like `uv run` to automatically install dependencies when executing scripts.
 
@@ -52,6 +48,6 @@ contributing
 
 ## Related Projects
 
-- [PEP 723](https://peps.python.org/pep-0723/) - Inline script metadata specification  
+- [PEP 723](https://peps.python.org/pep-0723/) - Inline script metadata specification
 - [uv tools guide](https://docs.astral.sh/uv/guides/tools/) - Tool management with uv
 - [uv issue #6283](https://github.com/astral-sh/uv/issues/6283) - Autodetect dependencies proposal
