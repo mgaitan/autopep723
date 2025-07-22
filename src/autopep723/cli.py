@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+from importlib.metadata import version
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -24,13 +25,6 @@ Shebang usage:
     )
 
     try:
-        from importlib.metadata import version
-
-        package_version = version("autopep723")
-    except ImportError:
-        # Fallback for Python < 3.8
-        from importlib_metadata import version
-
         package_version = version("autopep723")
     except Exception:
         package_version = "unknown"
