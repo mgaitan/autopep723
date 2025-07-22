@@ -9,6 +9,7 @@ from autopep723.validation import (
     check_uv_available,
     validate_and_prepare_script,
     validate_script_exists,
+    validate_script_input,
     validate_uv_available,
 )
 
@@ -166,3 +167,27 @@ def test_validate_script_exists_error_message(tmp_path, capsys):
 
     captured = capsys.readouterr()
     assert "does not exist" in captured.err
+
+
+def test_validate_script_input_url():
+    """Test validate_script_input with URL (should not raise)."""
+    # URLs should be valid - no exception should be raised
+    validate_script_input("https://example.com/script.py")
+    validate_script_input("http://localhost/test.py")
+
+
+def test_validate_script_input_local_file(tmp_path):
+    """Test validate_script_input with local file."""
+    script = tmp_path / "test_script.py"
+    script.write_text("print('hello')")
+
+    # Should not raise any exceptions
+    validate_script_input(str(script))
+
+
+def test_validate_script_input_nonexistent_local_file(tmp_path):
+    """Test validate_script_input with non-existent local file."""
+    script = tmp_path / "nonexistent.py"
+
+    with pytest.raises(SystemExit):
+        validate_script_input(str(script))

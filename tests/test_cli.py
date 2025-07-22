@@ -349,3 +349,29 @@ def test_cli_no_arguments_coverage():
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(sys, "argv", ["autopep723"])
         assert is_default_run_command() is False
+
+
+def test_cli_add_remote_script_message(mocker, capsys):
+    """Test CLI add command with remote script shows appropriate message."""
+    # Mock is_url to return True
+    mocker.patch("autopep723.validation.is_url", return_value=True)
+
+    # Mock resolve_script_path to return a different path (simulating download)
+    from pathlib import Path
+
+    mock_temp_path = Path("/tmp/autopep723_test.py")
+    mocker.patch("autopep723.commands.resolve_script_path", return_value=mock_temp_path)
+
+    # Mock other functions
+    mocker.patch("autopep723.commands.validate_script_input")
+    mocker.patch("autopep723.commands.get_third_party_imports", return_value=["requests"])
+    mocker.patch("autopep723.commands.generate_pep723_metadata", return_value="# metadata")
+    mocker.patch("autopep723.commands.update_file_with_metadata")
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", "add", "https://example.com/script.py"])
+        main()
+
+    captured = capsys.readouterr()
+    assert "Note: Working with downloaded script at" in captured.out
+    assert "Cannot update original remote script." in captured.out

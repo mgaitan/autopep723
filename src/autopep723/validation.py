@@ -3,6 +3,8 @@
 import sys
 from pathlib import Path
 
+from . import is_url
+
 
 def validate_script_exists(script_path: Path) -> bool:
     """Validate that the script file exists.
@@ -51,6 +53,22 @@ def validate_uv_available() -> bool:
         print("Please install uv: https://github.com/astral-sh/uv", file=sys.stderr)
         sys.exit(1)
     return True
+
+
+def validate_script_input(script_input: str) -> None:
+    """Validate script input (file path or URL).
+
+    Args:
+        script_input: File path or URL string
+    """
+    if is_url(script_input):
+        # For URLs, we can't validate existence beforehand
+        # The download function will handle errors
+        return
+    else:
+        script_path = Path(script_input)
+        validate_script_exists(script_path)
+        check_script_extension(script_path)
 
 
 def validate_and_prepare_script(script_path: Path) -> None:

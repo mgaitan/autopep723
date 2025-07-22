@@ -5,12 +5,15 @@ import pytest
 from autopep723 import (
     IMPORT_TO_PACKAGE_MAP,
     check_uv_available,
+    download_script,
     extract_existing_metadata,
     generate_pep723_metadata,
     get_builtin_modules,
     get_third_party_imports,
     has_existing_metadata,
     has_pep723_metadata,
+    is_url,
+    resolve_script_path,
     run_with_uv,
     update_file_with_metadata,
 )
@@ -476,3 +479,117 @@ import numpy as np
     assert '"flask"' not in updated_content  # Should be replaced
     assert 'requires-python = ">=3.13"' in updated_content
     assert 'requires-python = ">=3.11"' not in updated_content
+
+
+# URL functionality tests
+def test_is_url():
+    """Test URL detection function."""
+
+    # Valid URLs
+    assert is_url("https://example.com/script.py") is True
+    assert is_url("http://localhost/test.py") is True
+    assert is_url("ftp://server.com/file.py") is True
+
+    # Invalid URLs
+    assert is_url("script.py") is False
+    assert is_url("/path/to/script.py") is False
+    assert is_url("./relative/path.py") is False
+    assert is_url("") is False
+    assert is_url("not-a-url") is False
+
+
+def test_resolve_script_path_local():
+    """Test resolve_script_path with local files."""
+
+    # Test with local path
+    result = resolve_script_path("script.py")
+    assert result == Path("script.py")
+
+    result = resolve_script_path("/absolute/path.py")
+    assert result == Path("/absolute/path.py")
+
+
+def test_download_script(mocker, tmp_path):
+    """Test script downloading functionality."""
+    # Mock urllib.request.urlopen
+    mock_response = mocker.Mock()
+    mock_response.read.return_value = b'import requests\nprint("hello")'
+    mock_response.__enter__ = mocker.Mock(return_value=mock_response)
+    mock_response.__exit__ = mocker.Mock(return_value=None)
+
+    mocker.patch("urllib.request.urlopen", return_value=mock_response)
+
+    # Mock tempfile.NamedTemporaryFile
+    temp_file = tmp_path / "autopep723_test.py"
+    mock_file = mocker.Mock()
+    mock_file.name = str(temp_file)
+    mock_file.write = mocker.Mock()
+    mock_file.__enter__ = mocker.Mock(return_value=mock_file)
+    mock_file.__exit__ = mocker.Mock(return_value=None)
+
+    mocker.patch("tempfile.NamedTemporaryFile", return_value=mock_file)
+
+    # Test download
+    url = "https://example.com/script.py"
+    result = download_script(url)
+
+    assert result == Path(tmp_path / "autopep723_test.py")
+
+
+def test_resolve_script_path_url(mocker, tmp_path):
+    """Test resolve_script_path with URLs."""
+    # Mock urllib.request.urlopen
+    mock_response = mocker.Mock()
+    mock_response.read.return_value = b'import requests\nprint("hello")'
+    mock_response.__enter__ = mocker.Mock(return_value=mock_response)
+    mock_response.__exit__ = mocker.Mock(return_value=None)
+
+    mocker.patch("urllib.request.urlopen", return_value=mock_response)
+
+    # Mock tempfile.NamedTemporaryFile
+    temp_file = tmp_path / "autopep723_test.py"
+    temp_file.write_text('import requests\nprint("hello")')
+    mock_file = mocker.Mock()
+    mock_file.name = str(temp_file)
+    mock_file.write = mocker.Mock()
+    mock_file.__enter__ = mocker.Mock(return_value=mock_file)
+    mock_file.__exit__ = mocker.Mock(return_value=None)
+
+    mocker.patch("tempfile.NamedTemporaryFile", return_value=mock_file)
+
+    # Test with URL
+    url = "https://example.com/script.py"
+    result = resolve_script_path(url)
+
+    assert result == Path(tmp_path / "autopep723_test.py")
+
+
+def test_download_script_error(mocker):
+    """Test download_script error handling."""
+    # Mock urllib.request.urlopen to raise an exception
+    mocker.patch("urllib.request.urlopen", side_effect=Exception("Network error"))
+
+    url = "https://example.com/script.py"
+
+    with pytest.raises(SystemExit):
+        download_script(url)
+
+
+def test_is_url_error_handling():
+    """Test is_url with malformed input that could cause exceptions."""
+    # Test with None and other edge cases that might cause exceptions
+    assert is_url(None) is False
+    assert is_url(123) is False  # Non-string input
+    assert is_url([]) is False  # List input
+
+
+def test_get_third_party_imports_file_read_error(mocker, tmp_path):
+    """Test get_third_party_imports when file read fails."""
+    script = tmp_path / "test_script.py"
+    script.write_text("import requests")
+
+    # Mock pathlib Path.read_text to raise an exception
+    mocker.patch.object(type(script), "read_text", side_effect=OSError("Permission denied"))
+
+    imports = get_third_party_imports(script)
+    assert imports == []

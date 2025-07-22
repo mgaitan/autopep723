@@ -2,6 +2,9 @@ import ast
 import pkgutil
 import subprocess
 import sys
+import tempfile
+import urllib.parse
+import urllib.request
 from pathlib import Path
 
 # Mapping for packages where import name differs from install name
@@ -71,13 +74,15 @@ def get_third_party_imports(file_path: Path) -> list[str]:
     Returns:
         List of third-party package names
     """
-    with open(file_path, encoding="utf-8") as file:
-        try:
-            content = file.read()
-            tree = ast.parse(content)
-        except SyntaxError as e:
-            print(f"Error parsing {file_path}: {e}", file=sys.stderr)
-            return []
+    try:
+        content = file_path.read_text(encoding="utf-8")
+        tree = ast.parse(content)
+    except SyntaxError as e:
+        print(f"Error parsing {file_path}: {e}", file=sys.stderr)
+        return []
+    except Exception as e:
+        print(f"Error reading {file_path}: {e}", file=sys.stderr)
+        return []
 
     builtin_modules = get_builtin_modules()
     all_imports = set()
@@ -156,8 +161,7 @@ def extract_existing_metadata(content: str) -> tuple[str, str, str]:
 
 def update_file_with_metadata(file_path: Path, metadata: str) -> None:
     """Update the file with new PEP 723 metadata."""
-    with open(file_path, encoding="utf-8") as file:
-        content = file.read()
+    content = file_path.read_text(encoding="utf-8")
 
     if has_existing_metadata(content):
         before, _, after = extract_existing_metadata(content)
@@ -170,8 +174,7 @@ def update_file_with_metadata(file_path: Path, metadata: str) -> None:
         else:
             new_content = metadata + "\n" + content
 
-    with open(file_path, "w", encoding="utf-8") as file:
-        file.write(new_content)
+    file_path.write_text(new_content, encoding="utf-8")
 
 
 def run_with_uv(script_path: Path, dependencies: list[str]) -> None:
@@ -207,11 +210,78 @@ def check_uv_available() -> bool:
 def has_pep723_metadata(script_path: Path) -> bool:
     """Check if script already has PEP 723 metadata."""
     try:
-        with open(script_path, encoding="utf-8") as f:
-            content = f.read()
-            return has_existing_metadata(content)
+        content = script_path.read_text(encoding="utf-8")
+        return has_existing_metadata(content)
     except Exception:
         return False
+
+
+def is_url(path: str) -> bool:
+    """Check if the given path is a valid URL.
+
+    Args:
+        path: String to check
+
+    Returns:
+        True if path is a URL, False otherwise
+    """
+    try:
+        result = urllib.parse.urlparse(path)
+        return all([result.scheme, result.netloc])
+    except Exception:
+        return False
+
+
+def download_script(url: str) -> Path:
+    """Download a script from URL to a temporary file.
+
+    Args:
+        url: URL to download from
+
+    Returns:
+        Path to the downloaded temporary file
+
+    Raises:
+        Exception: If download fails
+    """
+    try:
+        print(f"Downloading script from: {url}")
+
+        # Download the file
+        with urllib.request.urlopen(url) as response:
+            content = response.read().decode("utf-8")
+
+        # Create a temporary file with .py extension
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".py", prefix="autopep723_", delete=False, encoding="utf-8"
+        ) as temp_file:
+            temp_file.write(content)
+            temp_path = Path(temp_file.name)
+
+        print(f"Script downloaded to: {temp_path}")
+        return temp_path
+
+    except Exception as e:
+        print(f"Error downloading script from {url}: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def resolve_script_path(script_input: str) -> Path:
+    """Resolve script input to a local file path.
+
+    If input is a URL, downloads it to a temporary file.
+    Otherwise, returns the path as-is.
+
+    Args:
+        script_input: File path or URL
+
+    Returns:
+        Path to local script file
+    """
+    if is_url(script_input):
+        return download_script(script_input)
+    else:
+        return Path(script_input)
 
 
 def main() -> None:

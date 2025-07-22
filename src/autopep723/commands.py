@@ -1,29 +1,28 @@
 """Commands module for autopep723 - handles different command implementations."""
 
-import sys
-from pathlib import Path
-
 from . import (
     generate_pep723_metadata,
     get_third_party_imports,
     has_pep723_metadata,
+    resolve_script_path,
     run_with_uv,
     update_file_with_metadata,
 )
-from .validation import validate_and_prepare_script, validate_uv_available
+from .validation import validate_script_input, validate_uv_available
 
 
-def run_script_command(script_path_str: str) -> None:
+def run_script_command(script_input: str) -> None:
     """Handle the default script execution command.
 
     Args:
-        script_path_str: Path to the script as string
+        script_input: Path to the script or URL as string
     """
-    script_path = Path(script_path_str)
-
     # Validate prerequisites
     validate_uv_available()
-    validate_and_prepare_script(script_path)
+    validate_script_input(script_input)
+
+    # Resolve script path (download if URL)
+    script_path = resolve_script_path(script_input)
 
     # Check for existing PEP 723 metadata
     if has_pep723_metadata(script_path):
@@ -41,18 +40,16 @@ def run_script_command(script_path_str: str) -> None:
         run_with_uv(script_path, dependencies)
 
 
-def check_command(script_path_str: str, python_version: str) -> None:
+def check_command(script_input: str, python_version: str) -> None:
     """Handle the check command - analyze and print metadata.
 
     Args:
-        script_path_str: Path to the script as string
+        script_input: Path to the script or URL as string
         python_version: Required Python version
     """
-    script_path = Path(script_path_str)
-
-    if not script_path.exists():
-        print(f"Error: Script '{script_path}' does not exist.", file=sys.stderr)
-        sys.exit(1)
+    # Validate input and resolve path
+    validate_script_input(script_input)
+    script_path = resolve_script_path(script_input)
 
     dependencies = get_third_party_imports(script_path)
     metadata = generate_pep723_metadata(dependencies, python_version)
@@ -60,18 +57,22 @@ def check_command(script_path_str: str, python_version: str) -> None:
     print(metadata)
 
 
-def add_command(script_path_str: str, python_version: str) -> None:
+def add_command(script_input: str, python_version: str) -> None:
     """Handle the add command - update script with metadata.
 
     Args:
-        script_path_str: Path to the script as string
+        script_input: Path to the script or URL as string
         python_version: Required Python version
     """
-    script_path = Path(script_path_str)
+    # Validate input and resolve path
+    validate_script_input(script_input)
+    script_path = resolve_script_path(script_input)
 
-    if not script_path.exists():
-        print(f"Error: Script '{script_path}' does not exist.", file=sys.stderr)
-        sys.exit(1)
+    # Note: For URLs, we can't update the original file
+    # This will work on the downloaded temporary file
+    if script_input != str(script_path):
+        print(f"Note: Working with downloaded script at {script_path}")
+        print("Cannot update original remote script.")
 
     dependencies = get_third_party_imports(script_path)
     metadata = generate_pep723_metadata(dependencies, python_version)

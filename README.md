@@ -7,6 +7,9 @@ Simply run your script via `autopep723`:
 ```bash
 # Run directly without installing
 uvx autopep723 script.py
+
+# Run remote scripts directly from URLs
+uvx autopep723 https://gist.githubusercontent.com/user/repo/script.py
 ```
 
 `autopep723` analyzes scripts (statically, using `ast`) to detect third-party imports and generates PEP 723 inline script metadata to pass to `uv run`.
@@ -16,6 +19,9 @@ To install it permanently:
 ```bash
 uv tool install autopep723
 autopep723 script.py
+
+# Works with remote scripts too
+autopep723 https://gist.githubusercontent.com/mgaitan/8fb70482b46454cc22cb6f2417afb8ea/raw/757a8a27b96ed17fde37cc908d07a2c471937b3c/autopep723_example.py
 ```
 
 ## Shebang Integration
@@ -39,9 +45,34 @@ autopep723 add script.py
 
 # Check what metadata would be generated
 autopep723 check script.py
+
+# Works with remote scripts (downloads to temp file)
+autopep723 check https://example.com/script.py
+autopep723 add https://example.com/script.py  # Note: updates local temp file only
+
+# Run remote scripts directly
+autopep723 https://raw.githubusercontent.com/user/repo/script.py
 ```
 
 The `add` command is analogous to `uv add --script script.py 'dep1' 'dep2'`, but with automatic dependency detection - you don't need to manually specify which packages to add.
+
+## Remote Scripts
+
+`autopep723` can download and execute Python scripts directly from URLs, just like `uv run` does:
+
+```bash
+# Download and run a remote script with automatic dependency detection
+autopep723 https://gist.githubusercontent.com/user/repo/script.py
+
+# Check what dependencies would be detected for a remote script
+autopep723 check https://example.com/script.py
+```
+
+When working with remote scripts:
+- Scripts are downloaded to temporary files in `/tmp`
+- All dependency detection works the same as with local files
+- The `add` command works but only updates the temporary local copy
+- Supports any URL that returns a Python script (GitHub raw, gists, etc.)
 
 
 ## Features
@@ -50,6 +81,7 @@ The `add` command is analogous to `uv add --script script.py 'dep1' 'dep2'`, but
 - 🪶 **Minimal footprint** - perfect as `uv run` wrapper
 - 🔍 **Automatic dependency detection** via AST analysis
 - ✅ **PEP 723 compliant** metadata generation
+- 🌐 **Remote script support** - run scripts directly from URLs
 
 For detailed usage see the [documentation](https://autopep723.readthedocs.io/).
 
