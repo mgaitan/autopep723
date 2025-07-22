@@ -4,10 +4,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-from rich.console import Console
-
-console = Console()
-
 # Mapping for packages where import name differs from install name
 IMPORT_TO_PACKAGE_MAP = {
     "PIL": "Pillow",
@@ -80,7 +76,7 @@ def get_third_party_imports(file_path: Path) -> list[str]:
             content = file.read()
             tree = ast.parse(content)
         except SyntaxError as e:
-            console.print(f"[red]Error parsing {file_path}: {e}[/red]")
+            print(f"Error parsing {file_path}: {e}", file=sys.stderr)
             return []
 
     builtin_modules = get_builtin_modules()
@@ -187,15 +183,15 @@ def run_with_uv(script_path: Path, dependencies: list[str]) -> None:
 
     cmd.append(str(script_path))
 
-    console.print(f"[green]Running:[/green] {' '.join(cmd)}")
+    print(f"Running: {' '.join(cmd)}")
 
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as e:
-        console.print(f"[red]Error running script: {e}[/red]")
+        print(f"Error running script: {e}", file=sys.stderr)
         sys.exit(1)
     except FileNotFoundError:
-        console.print("[red]Error: 'uv' command not found. Please install uv first.[/red]")
+        print("Error: 'uv' command not found. Please install uv first.", file=sys.stderr)
         sys.exit(1)
 
 

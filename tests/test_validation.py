@@ -153,8 +153,8 @@ def test_validate_uv_available_error_messages(mocker, capsys):
         validate_uv_available()
 
     captured = capsys.readouterr()
-    assert "'uv' is not installed or not available in PATH" in captured.out
-    assert "Please install uv: https://github.com/astral-sh/uv" in captured.out
+    assert "'uv' is not installed or not available in PATH" in captured.err
+    assert "Please install uv: https://github.com/astral-sh/uv" in captured.err
 
 
 def test_validate_script_exists_error_message(tmp_path, capsys):
@@ -165,4 +165,4 @@ def test_validate_script_exists_error_message(tmp_path, capsys):
         validate_script_exists(script)
 
     captured = capsys.readouterr()
-    assert "does not exist" in captured.out
+    assert "does not exist" in captured.err

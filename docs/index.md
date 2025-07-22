@@ -1,6 +1,6 @@
 # autopep723
 
-A CLI tool that automatically generates [PEP 723](https://peps.python.org/pep-0723/) metadata for Python scripts by analyzing their imports and dependencies.
+A **zero-dependency** CLI tool that automatically generates [PEP 723](https://peps.python.org/pep-0723/) metadata for Python scripts by analyzing their imports and dependencies.
 
 ## Quick Start
 
@@ -18,6 +18,12 @@ autopep723 script.py
 ## What it does
 
 `autopep723` analyzes Python scripts to detect third-party imports and generates PEP 723 inline script metadata. This enables tools like `uv run` to automatically install dependencies when executing scripts.
+
+**Key Features:**
+- ⚡ **Zero dependencies** - uses only Python standard library
+- 🪶 **Minimal footprint** - perfect for use as a `uv run` wrapper
+- 🔍 **Automatic dependency detection** via AST analysis
+- ✅ **PEP 723 compliant** metadata generation
 
 ## Shebang Usage
 

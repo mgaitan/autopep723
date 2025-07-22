@@ -1,6 +1,6 @@
 # autopep723
 
-A CLI tool that automatically generates [PEP 723](https://peps.python.org/pep-0723/) metadata for Python scripts by analyzing their imports and dependencies.
+A **zero-dependency** CLI tool that automatically generates [PEP 723](https://peps.python.org/pep-0723/) metadata for Python scripts by analyzing their imports and dependencies.
 
 ## What it does
 
@@ -57,6 +57,8 @@ This allows scripts to be executable without explicitly declaring dependencies. 
 - ✅ **PEP 723 compliant** metadata generation
 - 🛡️ **Built-in module filtering** excludes standard library
 - 🔧 **Graceful error handling** for syntax errors
+- ⚡ **Zero dependencies** - uses only Python standard library
+- 🪶 **Minimal footprint** - perfect for use as a `uv run` wrapper
 
 ## Documentation
 
@@ -75,7 +77,7 @@ Pull requests are welcome! 🎉
 - **One change per PR** - Keep it focused
 - **Tests required** - Maintain coverage standards  
 - **Follow conventions** - Use pytest and pytest-mock
-- **Be thoughtful** - This is a minimal wrapper, new dependencies need strong justification
+- **Be thoughtful** - This is a minimal, zero-dependency wrapper
 
 AI assistance is encouraged (this project is ~100% AI-generated), but contributions must meet quality standards.
 
