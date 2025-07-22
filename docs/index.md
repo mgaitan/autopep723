@@ -1,39 +1,48 @@
 # autopep723
 
-A CLI tool that dynamically generates [PEP 723](https://peps.python.org/pep-0723/) metadata for Python scripts by analyzing their imports and dependencies. Just run your script with `autopep723`:
+`autopep723` is a tiny wrapper on top of `uv run` that automatically detects third-party dependencies of Python scripts. Forget about manually managing dependencies for simple experiments!
 
 ## Quick Start
+
+The easiest way to use `autopep723` is via `uvx`:
 
 ```bash
 # Run directly without installing
 uvx autopep723 script.py
+```
 
-# Or install permanently
+To install the tool permanently:
+
+```bash
 uv tool install autopep723
 autopep723 script.py
 ```
 
-`autopep723` analyzes Python scripts to detect third-party imports and generates PEP 723 inline script metadata. This enables tools like `uv run` to automatically install dependencies when executing scripts.
+## Features
 
-**Key Features:**
 - ⚡ **Zero dependencies** - uses only Python standard library
-- 🪶 **Minimal footprint** - perfect for use as a `uv run` wrapper
+- 🪶 **Minimal footprint** - perfect as `uv run` wrapper
 - 🔍 **Automatic dependency detection** via AST analysis
 - ✅ **PEP 723 compliant** metadata generation
+- 🌐 **Remote script support** - run scripts directly from URLs
 
-## Shebang Usage
+## Shebang Integration
 
-Make your scripts executable with automatic dependency management:
+You can use `autopep723` directly as a shebang:
 
 ```python
 #!/usr/bin/env -S uvx autopep723
 import requests
 import numpy as np
 
-# Your script runs with dependencies auto-installed!
+# Your script here...
 ```
 
-`uvx` installs packages on-the-fly in an ephemeral environment, so no permanent installation is needed.
+Then running the script will automatically install the required dependencies in an ephemeral environment!
+
+```bash
+./script.py
+```
 
 ```{toctree}
 :maxdepth: 2
