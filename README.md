@@ -1,5 +1,13 @@
 # autopep723
 
+
+[![PyPI](https://img.shields.io/pypi/v/autopep723.svg)](https://pypi.org/project/autopep723/)
+[![Changelog](https://img.shields.io/github/v/release/mgaitan/autopep723?include_prereleases&label=changelog)](https://github.com/mgaitan/autopep723/releases)
+[![CI](https://github.com/mgaitan/honeycomb-cleaner/actions/workflows/ci.yml/badge.svg)](https://github.com/mgaitan/honeycomb-cleaner/actions/workflows/ci.yml)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v0.json)](https://github.com/mgaitan/honeycomb-cleaner/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mgaitan/autopep723/blob/main/LICENSE)
+
+
 A **zero-dependency** CLI tool that dynamically generates [PEP 723](https://peps.python.org/pep-0723/) metadata for Python scripts by analyzing their imports. Forget about manually managing dependencies for simple scripts!
 
 Simply run your script via `autopep723`:
