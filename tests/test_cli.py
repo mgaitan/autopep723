@@ -326,7 +326,7 @@ def test_cli_add_with_python_version(tmp_path):
     assert 'requires-python = ">=3.12"' in updated_content
 
 
-def test_cli_add_no_dependencies_message(tmp_path, capsys):
+def test_cli_add_no_dependencies_message(tmp_path, caplog):
     """Test CLI add command shows message when no dependencies detected."""
     script = tmp_path / "test_script.py"
     script.write_text("""import os
@@ -338,8 +338,7 @@ print("Hello, world!")
         mp.setattr(sys, "argv", ["autopep723", "add", str(script)])
         main()
 
-    captured = capsys.readouterr()
-    assert "No third-party dependencies detected" in captured.out
+    assert "No external dependencies found" in caplog.text
 
 
 def test_cli_no_arguments_coverage():
@@ -351,7 +350,7 @@ def test_cli_no_arguments_coverage():
         assert is_default_run_command() is False
 
 
-def test_cli_add_remote_script_message(mocker, capsys):
+def test_cli_add_remote_script_message(mocker, caplog):
     """Test CLI add command with remote script shows appropriate message."""
     # Mock is_url to return True
     mocker.patch("autopep723.validation.is_url", return_value=True)
@@ -372,6 +371,86 @@ def test_cli_add_remote_script_message(mocker, capsys):
         mp.setattr(sys, "argv", ["autopep723", "add", "https://example.com/script.py"])
         main()
 
-    captured = capsys.readouterr()
-    assert "Note: Working with downloaded script at" in captured.out
-    assert "Cannot update original remote script." in captured.out
+    assert "Working with downloaded script at" in caplog.text
+    assert "Cannot update original remote script." in caplog.text
+
+
+def test_get_script_path_from_args_no_args():
+    """Test get_script_path_from_args when no script path is provided (covers line 84)."""
+    from autopep723.cli import get_script_path_from_args
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723"])
+        with pytest.raises(ValueError, match="No script path provided"):
+            get_script_path_from_args()
+
+
+def test_logger_coverage(caplog, monkeypatch):
+    """Quick test to cover missing logger lines."""
+
+    from autopep723.logger import ColoredFormatter, init_logger, warning
+
+    # Test NO_COLOR environment
+    monkeypatch.setenv("NO_COLOR", "1")
+    formatter = ColoredFormatter(use_colors=True)
+    assert not formatter.use_colors
+
+    # Test TERM=dumb
+    monkeypatch.setenv("TERM", "dumb")
+    formatter = ColoredFormatter(use_colors=True)
+    assert not formatter.use_colors
+
+    # Test warning function (line 79)
+    warning("test warning message")
+    assert "Warning: test warning message" in caplog.text
+
+    # Test logger reinit
+    init_logger(verbose=True, use_colors=False)
+    init_logger(verbose=False, use_colors=False)
+
+
+def test_main_with_verbose_flag(tmp_path, mocker):
+    """Test main function with verbose flag to cover verbose reinitialization."""
+    mocker.patch("autopep723.validation.check_uv_available", return_value=True)
+    mock_init_logger = mocker.patch("autopep723.logger.init_logger")
+    mocker.patch("autopep723.commands.run_with_uv")
+
+    script = tmp_path / "test_script.py"
+    script.write_text("import requests")
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", "-v", str(script)])
+        main()
+
+    # Verify verbose logger was initialized
+    mock_init_logger.assert_called_with(verbose=True)
+
+
+def test_main_check_with_verbose(tmp_path, mocker, capsys):
+    """Test main check command with verbose flag."""
+    mock_init_logger = mocker.patch("autopep723.logger.init_logger")
+
+    script = tmp_path / "test_script.py"
+    script.write_text("import requests")
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", "check", "--verbose", str(script)])
+        main()
+
+    # Verify verbose logger was initialized
+    mock_init_logger.assert_called_with(verbose=True)
+
+
+def test_main_add_with_verbose(tmp_path, mocker):
+    """Test main add command with verbose flag."""
+    mock_init_logger = mocker.patch("autopep723.logger.init_logger")
+
+    script = tmp_path / "test_script.py"
+    script.write_text("import requests")
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", "add", "--verbose", str(script)])
+        main()
+
+    # Verify verbose logger was initialized
+    mock_init_logger.assert_called_with(verbose=True)

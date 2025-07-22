@@ -7,6 +7,8 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+from .logger import command, error, verbose
+
 # Mapping for packages where import name differs from install name
 IMPORT_TO_PACKAGE_MAP = {
     "PIL": "Pillow",
@@ -78,10 +80,10 @@ def get_third_party_imports(file_path: Path) -> list[str]:
         content = file_path.read_text(encoding="utf-8")
         tree = ast.parse(content)
     except SyntaxError as e:
-        print(f"Error parsing {file_path}: {e}", file=sys.stderr)
+        error(f"Error parsing {file_path}: {e}")
         return []
     except Exception as e:
-        print(f"Error reading {file_path}: {e}", file=sys.stderr)
+        error(f"Error reading {file_path}: {e}")
         return []
 
     builtin_modules = get_builtin_modules()
@@ -179,6 +181,7 @@ def update_file_with_metadata(file_path: Path, metadata: str) -> None:
 
 def run_with_uv(script_path: Path, dependencies: list[str]) -> None:
     """Run the script using uv run with dependencies."""
+
     cmd = ["uv", "run"]
 
     for dep in dependencies:
@@ -186,15 +189,19 @@ def run_with_uv(script_path: Path, dependencies: list[str]) -> None:
 
     cmd.append(str(script_path))
 
-    print(f"Running: {' '.join(cmd)}")
+    command(" ".join(cmd))
 
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as e:
-        print(f"Error running script: {e}", file=sys.stderr)
-        sys.exit(1)
+        if e.returncode != 0:
+            error(f"Script execution failed with exit code {e.returncode}")
+        else:
+            error(f"Error running script: {e}")
+        sys.exit(e.returncode)
     except FileNotFoundError:
-        print("Error: 'uv' command not found. Please install uv first.", file=sys.stderr)
+        error("'uv' command not found. Please install uv first.")
+        error("Install with: curl -LsSf https://astral.sh/uv/install.sh | sh")
         sys.exit(1)
 
 
@@ -244,8 +251,9 @@ def download_script(url: str) -> Path:
     Raises:
         Exception: If download fails
     """
+
     try:
-        print(f"Downloading script from: {url}")
+        verbose(f"📥 Downloading script from: {url}")
 
         # Download the file
         with urllib.request.urlopen(url) as response:
@@ -258,11 +266,11 @@ def download_script(url: str) -> Path:
             temp_file.write(content)
             temp_path = Path(temp_file.name)
 
-        print(f"Script downloaded to: {temp_path}")
+        verbose(f"💾 Script downloaded to: {temp_path}")
         return temp_path
 
     except Exception as e:
-        print(f"Error downloading script from {url}: {e}", file=sys.stderr)
+        error(f"Error downloading script from {url}: {e}")
         sys.exit(1)
 
 
@@ -293,6 +301,10 @@ def main() -> None:
         should_show_help,
     )
     from .commands import add_command, check_command, run_script_command
+    from .logger import init_logger
+
+    # Initialize logger with default settings first
+    init_logger(verbose=False)
 
     # Handle help case
     if should_show_help():
@@ -302,6 +314,13 @@ def main() -> None:
 
     # Handle default run command (script execution)
     if is_default_run_command():
+        # Check if verbose flag is present in args
+        verbose = "-v" in sys.argv or "--verbose" in sys.argv
+
+        # Re-initialize logger with verbose setting if needed
+        if verbose:
+            init_logger(verbose=True)
+
         script_path = get_script_path_from_args()
         run_script_command(script_path)
         return
@@ -309,6 +328,10 @@ def main() -> None:
     # Handle subcommands
     parser = create_parser()
     args = parser.parse_args()
+
+    # Re-initialize logger with verbose flag from args if needed
+    if args.verbose:
+        init_logger(verbose=True)
 
     if args.command == "check":
         check_command(args.script, args.python_version)

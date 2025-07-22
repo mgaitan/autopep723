@@ -312,17 +312,42 @@ def test_run_with_uv_no_dependencies(mocker):
 
 
 def test_run_with_uv_command_error(mocker):
-    """Test uv run with command error."""
+    """Test uv run with command error, covering the non-zero exit code path."""
     from subprocess import CalledProcessError
 
     mock_subprocess = mocker.patch("autopep723.subprocess.run")
-    mock_subprocess.side_effect = CalledProcessError(1, "uv")
+    mock_subprocess.side_effect = CalledProcessError(1, "uv", output="Error output")
+    mock_sys_exit = mocker.patch("sys.exit")
+    mock_error_log = mocker.patch("autopep723.error")
 
     script_path = Path("test_script.py")
     dependencies = ["requests"]
 
-    with pytest.raises(SystemExit):
-        run_with_uv(script_path, dependencies)
+    mock_error_log.reset_mock()  # Reset mock to capture only the relevant error call
+    run_with_uv(script_path, dependencies)
+
+    mock_sys_exit.assert_called_once_with(1)
+    mock_error_log.assert_called_with("Script execution failed with exit code 1")
+
+
+def test_run_with_uv_command_error_zero_returncode(mocker):
+    """Test uv run with CalledProcessError but returncode 0 (covers else branch)."""
+    from subprocess import CalledProcessError
+
+    mock_subprocess = mocker.patch("autopep723.subprocess.run")
+    # Create a CalledProcessError with returncode 0 to hit the else branch
+    error = CalledProcessError(0, "uv", output="Error output")
+    mock_subprocess.side_effect = error
+    mock_sys_exit = mocker.patch("sys.exit")
+    mock_error_log = mocker.patch("autopep723.error")
+
+    script_path = Path("test_script.py")
+    dependencies = ["requests"]
+
+    run_with_uv(script_path, dependencies)
+
+    mock_sys_exit.assert_called_once_with(0)
+    mock_error_log.assert_called_with(f"Error running script: {error}")
 
 
 def test_run_with_uv_not_found(mocker):
