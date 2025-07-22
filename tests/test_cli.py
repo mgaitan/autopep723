@@ -326,7 +326,7 @@ def test_cli_add_with_python_version(tmp_path):
     assert 'requires-python = ">=3.12"' in updated_content
 
 
-def test_cli_add_no_dependencies_message(tmp_path, capsys):
+def test_cli_add_no_dependencies_message(tmp_path, caplog):
     """Test CLI add command shows message when no dependencies detected."""
     script = tmp_path / "test_script.py"
     script.write_text("""import os
@@ -338,8 +338,7 @@ print("Hello, world!")
         mp.setattr(sys, "argv", ["autopep723", "add", str(script)])
         main()
 
-    captured = capsys.readouterr()
-    assert "No third-party dependencies detected" in captured.out
+    assert "No external dependencies found" in caplog.text
 
 
 def test_cli_no_arguments_coverage():
@@ -351,7 +350,7 @@ def test_cli_no_arguments_coverage():
         assert is_default_run_command() is False
 
 
-def test_cli_add_remote_script_message(mocker, capsys):
+def test_cli_add_remote_script_message(mocker, caplog):
     """Test CLI add command with remote script shows appropriate message."""
     # Mock is_url to return True
     mocker.patch("autopep723.validation.is_url", return_value=True)
@@ -372,6 +371,5 @@ def test_cli_add_remote_script_message(mocker, capsys):
         mp.setattr(sys, "argv", ["autopep723", "add", "https://example.com/script.py"])
         main()
 
-    captured = capsys.readouterr()
-    assert "Note: Working with downloaded script at" in captured.out
-    assert "Cannot update original remote script." in captured.out
+    assert "Working with downloaded script at" in caplog.text
+    assert "Cannot update original remote script." in caplog.text

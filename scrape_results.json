@@ -1,0 +1,15 @@
+[
+  {
+    "url": "https://example.com",
+    "title": "Example Domain",
+    "description": "",
+    "links_count": 1,
+    "links": [
+      {
+        "url": "https://www.iana.org/domains/example",
+        "text": "More information..."
+      }
+    ],
+    "scraped_at": 1753206380.1951847
+  }
+]

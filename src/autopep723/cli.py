@@ -24,6 +24,9 @@ Shebang usage:
     )
 
     parser.add_argument("--version", action="version", version="%(prog)s 1.0.0")
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Show verbose output including download progress and commands"
+    )
 
     # Create subparsers
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
@@ -36,6 +39,9 @@ Shebang usage:
         default=">=3.13",
         help="Required Python version (default: >=3.13)",
     )
+    check_parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Show verbose output including download progress and commands"
+    )
 
     # Add command
     add_parser = subparsers.add_parser("add", help="Update script with metadata")
@@ -44,6 +50,9 @@ Shebang usage:
         "--python-version",
         default=">=3.13",
         help="Required Python version (default: >=3.13)",
+    )
+    add_parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Show verbose output including download progress and commands"
     )
 
     return parser
@@ -69,4 +78,8 @@ def is_default_run_command() -> bool:
 
 def get_script_path_from_args() -> str:
     """Get script path from command line arguments for default run command."""
-    return sys.argv[1]
+    # Filter out verbose flags to get the script path
+    args = [arg for arg in sys.argv[1:] if arg not in ["-v", "--verbose"]]
+    if not args:
+        raise ValueError("No script path provided")
+    return args[0]

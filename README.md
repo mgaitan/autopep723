@@ -48,6 +48,11 @@ autopep723 check script.py
 
 # Works with remote scripts (downloads to temp file)
 autopep723 check https://example.com/script.py
+
+# Use verbose mode to see detailed progress
+autopep723 -v script.py
+autopep723 check -v script.py
+autopep723 add -v script.py
 autopep723 add https://example.com/script.py  # Note: updates local temp file only
 
 # Run remote scripts directly

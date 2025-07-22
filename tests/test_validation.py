@@ -50,7 +50,7 @@ def test_check_script_extension_non_py_file(tmp_path, capsys):
     check_script_extension(script)
 
     captured = capsys.readouterr()
-    assert "does not have a .py extension" in captured.out
+    assert "does not have a .py extension" in captured.err
 
 
 def test_check_uv_available_true(mocker):
@@ -114,7 +114,7 @@ def test_validate_and_prepare_script_non_py_warning(tmp_path, capsys):
     validate_and_prepare_script(script)
 
     captured = capsys.readouterr()
-    assert "does not have a .py extension" in captured.out
+    assert "does not have a .py extension" in captured.err
 
 
 def test_validate_and_prepare_script_nonexistent(tmp_path):
@@ -141,7 +141,7 @@ def test_check_script_extension_parametrized(tmp_path, capsys, extension, should
 
     captured = capsys.readouterr()
     if should_warn:
-        assert "does not have a .py extension" in captured.out
+        assert "does not have a .py extension" in captured.err
     else:
         assert captured.out == ""
 
