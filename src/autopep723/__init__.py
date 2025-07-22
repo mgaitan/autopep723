@@ -222,7 +222,7 @@ def main() -> None:
         is_default_run_command,
         should_show_help,
     )
-    from .commands import check_command, run_script_command, upgrade_command
+    from .commands import add_command, check_command, run_script_command
 
     # Handle help case
     if should_show_help():
@@ -242,8 +242,8 @@ def main() -> None:
 
     if args.command == "check":
         check_command(args.script, args.python_version)
-    elif args.command == "upgrade":
-        upgrade_command(args.script, args.python_version)
+    elif args.command == "add":
+        add_command(args.script, args.python_version)
 
 
 if __name__ == "__main__":

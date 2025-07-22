@@ -88,10 +88,10 @@ Behind the scenes, `autopep723` parses your script using AST to detect third-par
 
 IMHO this approach solves several pain points that plague Python script distribution. Scripts just work out of the box with zero setup friction, while `uvx` ensures no environment pollution since dependencies are installed in isolation. Each script gets its own clean environment preventing version conflicts, making scripts truly portable without installation instructions. The speed of `uv` makes this practical for daily use rather than just a clever demo.
 
-BTW you can also use `autopep723` to upgrade existing scripts with PEP 723 metadata:
+BTW you can also use `autopep723` to add PEP 723 metadata to existing scripts:
 
 ```bash
-autopep723 upgrade script.py  # Adds metadata to file
+autopep723 add script.py  # Adds metadata to file
 ```
 
 and then just use `uv run script.py`

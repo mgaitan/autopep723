@@ -13,7 +13,7 @@ def create_parser() -> argparse.ArgumentParser:
 Examples:
   autopep723 script.py                   # Run script (default behavior)
   autopep723 check script.py             # Print metadata to stdout
-  autopep723 upgrade script.py           # Update file with metadata
+  autopep723 add script.py               # Update file with metadata
 
 Shebang usage:
   #!/usr/bin/env autopep723
@@ -36,10 +36,10 @@ Shebang usage:
         help="Required Python version (default: >=3.13)",
     )
 
-    # Upgrade command
-    upgrade_parser = subparsers.add_parser("upgrade", help="Update script with metadata")
-    upgrade_parser.add_argument("script", help="Path to Python script")
-    upgrade_parser.add_argument(
+    # Add command
+    add_parser = subparsers.add_parser("add", help="Update script with metadata")
+    add_parser.add_argument("script", help="Path to Python script")
+    add_parser.add_argument(
         "--python-version",
         default=">=3.13",
         help="Required Python version (default: >=3.13)",
@@ -60,7 +60,7 @@ def is_default_run_command() -> bool:
 
     # Check if first argument is not a subcommand or help flag
     first_arg = sys.argv[1]
-    subcommands = ["check", "upgrade"]
+    subcommands = ["check", "add"]
     help_flags = ["--help", "--version", "-h"]
 
     return first_arg not in subcommands and first_arg not in help_flags

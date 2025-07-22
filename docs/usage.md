@@ -57,12 +57,12 @@ Example output:
 # ///
 ```
 
-### Upgrade Mode
+### Add Mode
 
 Update a script file to include PEP 723 metadata:
 
 ```bash
-autopep723 upgrade script.py
+autopep723 add script.py
 ```
 
 This modifies the file in-place, adding the metadata block at the top.
@@ -77,8 +77,8 @@ Specify a custom Python version requirement:
 # For check mode
 autopep723 check --python-version ">=3.11" script.py
 
-# For upgrade mode  
-autopep723 upgrade --python-version ">=3.12" script.py
+# For add mode  
+autopep723 add --python-version ">=3.12" script.py
 ```
 
 ### Version Information
@@ -176,7 +176,7 @@ If a script already contains PEP 723 metadata, `autopep723` will:
 
 - **Run mode**: Use existing dependencies instead of analyzing imports
 - **Check mode**: Display the existing metadata
-- **Upgrade mode**: Skip the file (no changes made)
+- **Add mode**: Skip the file (no changes made)
 
 This prevents overwriting manually curated dependency lists.
 
@@ -218,7 +218,7 @@ Error: File 'nonexistent.py' not found
 
 1. Write your script with imports
 2. Test it with `autopep723 script.py`
-3. If satisfied, upgrade: `autopep723 upgrade script.py`
+3. If satisfied, add metadata: `autopep723 add script.py`
 4. Commit the script with embedded metadata
 
 ### CI/CD Integration

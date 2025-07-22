@@ -63,8 +63,8 @@ def main():
     print("  - Can be run without any external packages")
     print("\nTry running:")
     print("  autopep723 examples/simple_demo.py")
-    print("  autopep723 --upgrade examples/simple_demo.py")
-    print("  autopep723 --run examples/simple_demo.py")
+    print("  autopep723 add examples/simple_demo.py")
+    print("  autopep723 check examples/simple_demo.py")
 
 
 if __name__ == "__main__":

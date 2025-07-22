@@ -35,7 +35,7 @@ A script that uses external packages (`requests` and `beautifulsoup4`):
 autopep723 check examples/web_scraper.py
 
 # Update file with PEP 723 metadata
-autopep723 upgrade examples/web_scraper.py
+autopep723 add examples/web_scraper.py
 
 # Run with automatic dependency management
 autopep723 examples/web_scraper.py
@@ -136,7 +136,7 @@ Based on these examples, follow this pattern:
 
 1. **Write your script** with normal import statements
 2. **Test detection**: `autopep723 check script.py`
-3. **Add metadata**: `autopep723 upgrade script.py`
+3. **Add metadata**: `autopep723 add script.py`
 4. **Make executable** (optional): Add shebang and `chmod +x`
 
 The tool handles the complexity of dependency management automatically!

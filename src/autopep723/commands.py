@@ -60,8 +60,8 @@ def check_command(script_path_str: str, python_version: str) -> None:
     print(metadata)
 
 
-def upgrade_command(script_path_str: str, python_version: str) -> None:
-    """Handle the upgrade command - update script with metadata.
+def add_command(script_path_str: str, python_version: str) -> None:
+    """Handle the add command - update script with metadata.
 
     Args:
         script_path_str: Path to the script as string

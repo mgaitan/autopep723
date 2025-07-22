@@ -21,15 +21,15 @@ import numpy as np
     assert "requires-python" in captured.out
 
 
-def test_cli_upgrade_command(tmp_path):
-    """Test CLI upgrade command updating file with metadata."""
+def test_cli_add_command(tmp_path):
+    """Test CLI add command updating file with metadata."""
     script = tmp_path / "test_script.py"
     script.write_text("""import requests
 print("Hello")
 """)
 
     with pytest.MonkeyPatch.context() as mp:
-        mp.setattr(sys, "argv", ["autopep723", "upgrade", str(script)])
+        mp.setattr(sys, "argv", ["autopep723", "add", str(script)])
         main()
 
     # Check if file was updated
@@ -98,10 +98,10 @@ def test_cli_check_nonexistent_file():
             main()
 
 
-def test_cli_upgrade_nonexistent_file():
-    """Test CLI upgrade command with non-existent file."""
+def test_cli_add_nonexistent_file():
+    """Test CLI add command with non-existent file."""
     with pytest.MonkeyPatch.context() as mp:
-        mp.setattr(sys, "argv", ["autopep723", "upgrade", "nonexistent.py"])
+        mp.setattr(sys, "argv", ["autopep723", "add", "nonexistent.py"])
         with pytest.raises(SystemExit):
             main()
 
@@ -170,7 +170,7 @@ def test_cli_help_message(capsys):
     captured = capsys.readouterr()
     assert "Auto-generate PEP 723 metadata" in captured.out
     assert "check" in captured.out
-    assert "upgrade" in captured.out
+    assert "add" in captured.out
     assert "Examples:" in captured.out
 
 
@@ -185,8 +185,8 @@ def test_cli_version_message(capsys):
     assert "1.0.0" in captured.out
 
 
-def test_cli_upgrade_with_existing_metadata(tmp_path):
-    """Test CLI upgrade command when file already has metadata."""
+def test_cli_add_with_existing_metadata(tmp_path):
+    """Test CLI add command when file already has metadata."""
     script = tmp_path / "test_script.py"
     script.write_text("""#!/usr/bin/env python3
 # /// script
@@ -199,7 +199,7 @@ import numpy as np
 """)
 
     with pytest.MonkeyPatch.context() as mp:
-        mp.setattr(sys, "argv", ["autopep723", "upgrade", str(script)])
+        mp.setattr(sys, "argv", ["autopep723", "add", str(script)])
         main()
 
     # Check if file was updated correctly
@@ -309,8 +309,8 @@ def test_cli_check_with_python_version(tmp_path, capsys):
     assert 'requires-python = ">=3.12"' in captured.out
 
 
-def test_cli_upgrade_with_python_version(tmp_path):
-    """Test CLI upgrade command with custom python version."""
+def test_cli_add_with_python_version(tmp_path):
+    """Test CLI add command with custom python version."""
     script = tmp_path / "test_script.py"
     script.write_text("import requests")
 
@@ -318,7 +318,7 @@ def test_cli_upgrade_with_python_version(tmp_path):
         mp.setattr(
             sys,
             "argv",
-            ["autopep723", "upgrade", "--python-version", ">=3.12", str(script)],
+            ["autopep723", "add", "--python-version", ">=3.12", str(script)],
         )
         main()
 
@@ -326,8 +326,8 @@ def test_cli_upgrade_with_python_version(tmp_path):
     assert 'requires-python = ">=3.12"' in updated_content
 
 
-def test_cli_upgrade_no_dependencies_message(tmp_path, capsys):
-    """Test CLI upgrade command shows message when no dependencies detected."""
+def test_cli_add_no_dependencies_message(tmp_path, capsys):
+    """Test CLI add command shows message when no dependencies detected."""
     script = tmp_path / "test_script.py"
     script.write_text("""import os
 import sys
@@ -335,7 +335,7 @@ print("Hello, world!")
 """)
 
     with pytest.MonkeyPatch.context() as mp:
-        mp.setattr(sys, "argv", ["autopep723", "upgrade", str(script)])
+        mp.setattr(sys, "argv", ["autopep723", "add", str(script)])
         main()
 
     captured = capsys.readouterr()

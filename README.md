@@ -35,7 +35,7 @@ import numpy as np
 
 ```bash
 # Add/update PEP 723 metadata in the script
-autopep723 upgrade script.py
+autopep723 add script.py
 
 # Check what metadata would be generated
 autopep723 check script.py
