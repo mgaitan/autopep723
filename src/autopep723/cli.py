@@ -12,6 +12,7 @@ def create_parser() -> argparse.ArgumentParser:
         epilog="""
 Examples:
   autopep723 script.py                   # Run script (default behavior)
+  autopep723 https://example.com/script.py  # Run remote script
   autopep723 check script.py             # Print metadata to stdout
   autopep723 add script.py               # Update file with metadata
 
@@ -29,7 +30,7 @@ Shebang usage:
 
     # Check command
     check_parser = subparsers.add_parser("check", help="Analyze script and print metadata")
-    check_parser.add_argument("script", help="Path to Python script")
+    check_parser.add_argument("script", help="Path to Python script or URL")
     check_parser.add_argument(
         "--python-version",
         default=">=3.13",
@@ -38,7 +39,7 @@ Shebang usage:
 
     # Add command
     add_parser = subparsers.add_parser("add", help="Update script with metadata")
-    add_parser.add_argument("script", help="Path to Python script")
+    add_parser.add_argument("script", help="Path to Python script or URL")
     add_parser.add_argument(
         "--python-version",
         default=">=3.13",
