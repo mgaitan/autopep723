@@ -3,9 +3,6 @@
 import sys
 from pathlib import Path
 
-from rich.console import Console
-from rich.syntax import Syntax
-
 from . import (
     generate_pep723_metadata,
     get_third_party_imports,
@@ -14,8 +11,6 @@ from . import (
     update_file_with_metadata,
 )
 from .validation import validate_and_prepare_script, validate_uv_available
-
-console = Console()
 
 
 def run_script_command(script_path_str: str) -> None:
@@ -32,16 +27,16 @@ def run_script_command(script_path_str: str) -> None:
 
     # Check for existing PEP 723 metadata
     if has_pep723_metadata(script_path):
-        console.print("[blue]Script already has PEP 723 metadata. Using existing dependencies.[/blue]")
+        print("Script already has PEP 723 metadata. Using existing dependencies.")
         run_with_uv(script_path, [])  # Let uv handle dependencies from metadata
     else:
         # Analyze imports and run with detected dependencies
         dependencies = get_third_party_imports(script_path)
 
         if dependencies:
-            console.print(f"[blue]Detected dependencies:[/blue] {', '.join(dependencies)}")
+            print(f"Detected dependencies: {', '.join(dependencies)}")
         else:
-            console.print("[blue]No third-party dependencies detected.[/blue]")
+            print("No third-party dependencies detected.")
 
         run_with_uv(script_path, dependencies)
 
@@ -56,14 +51,13 @@ def check_command(script_path_str: str, python_version: str) -> None:
     script_path = Path(script_path_str)
 
     if not script_path.exists():
-        console.print(f"[red]Error: Script '{script_path}' does not exist.[/red]")
+        print(f"Error: Script '{script_path}' does not exist.", file=sys.stderr)
         sys.exit(1)
 
     dependencies = get_third_party_imports(script_path)
     metadata = generate_pep723_metadata(dependencies, python_version)
 
-    syntax = Syntax(metadata, "toml", theme="monokai", line_numbers=False)
-    console.print(syntax)
+    print(metadata)
 
 
 def upgrade_command(script_path_str: str, python_version: str) -> None:
@@ -76,16 +70,16 @@ def upgrade_command(script_path_str: str, python_version: str) -> None:
     script_path = Path(script_path_str)
 
     if not script_path.exists():
-        console.print(f"[red]Error: Script '{script_path}' does not exist.[/red]")
+        print(f"Error: Script '{script_path}' does not exist.", file=sys.stderr)
         sys.exit(1)
 
     dependencies = get_third_party_imports(script_path)
     metadata = generate_pep723_metadata(dependencies, python_version)
 
     update_file_with_metadata(script_path, metadata)
-    console.print(f"[green]Updated {script_path} with PEP 723 metadata.[/green]")
+    print(f"Updated {script_path} with PEP 723 metadata.")
 
     if dependencies:
-        console.print(f"[blue]Dependencies:[/blue] {', '.join(dependencies)}")
+        print(f"Dependencies: {', '.join(dependencies)}")
     else:
-        console.print("[blue]No third-party dependencies detected.[/blue]")
+        print("No third-party dependencies detected.")

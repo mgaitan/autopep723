@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [{ name = "Martín Gaitán", email = "gaitan@gmail.com" }]
 license = "MIT"
 requires-python = ">=3.9"
-dependencies = ["rich>=12.0.0"]
+dependencies = []
 
 [tool.uv]
 dev-dependencies = [

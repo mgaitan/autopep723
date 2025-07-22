@@ -14,15 +14,16 @@ Keep pull requests focused on a single feature, bug fix, or improvement. This ma
 - **Respect coverage requirements** - Currently set at 99.5%
 
 ### Dependencies Policy
-This is a minimal wrapper around `uv run`. Be very thoughtful about proposing new dependencies:
+This is a minimal, **zero-dependency** wrapper around `uv run`. We maintain this policy for optimal performance:
 
-- Currently only `rich` is required (and we might remove it)
-- New dependencies need strong justification
-- Consider if functionality can be achieved with standard library
-- Avoid adding heavy dependencies for minor features
+- **No external dependencies** - uses only Python standard library
+- Perfect for use as `uv run` wrapper with minimal overhead
+- New dependencies are not accepted unless absolutely critical
+- All functionality must be achievable with standard library
+- Minimal footprint is a core design principle
 
 ### AI Assistance
-AI assistance is welcome alongside manual contributions! This project was largely AI-assisted (using [Zed](https://zed.dev/) with [Claude Sonnet 3.5](https://www.anthropic.com/claude) and [Gemini Flash 2.0](https://deepmind.google/technologies/gemini/flash/)), but all contributions must meet quality standards regardless of how they were created.
+AI assistance is welcome alongside manual contributions! This project was largely AI-assisted (using [Zed](https://zed.dev/) with [Claude Sonnet 3.5](https://www.anthropic.com/claude) and [Gemini Flash 2.0](https://deepmind.google/technologies/gemini/flash/)), but all contributions must meet quality standards and respect the zero-dependency policy regardless of how they were created.
 
 ## Development Setup
 
