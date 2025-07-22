@@ -73,11 +73,12 @@ import numpy as np
     # Verify run_with_uv was called with correct arguments
     mock_run_with_uv.assert_called_once()
     args = mock_run_with_uv.call_args[0]
-    script_path, dependencies = args
+    script_path, dependencies, script_args = args
 
     assert str(script_path) == str(script)
     assert "requests" in dependencies
     assert "numpy" in dependencies
+    assert script_args == []
 
 
 def test_cli_nonexistent_file(mocker):
@@ -263,9 +264,10 @@ import requests
     # Should call run_with_uv with empty deps (let uv handle metadata)
     mock_run_with_uv.assert_called_once()
     args = mock_run_with_uv.call_args[0]
-    script_path, dependencies = args
+    script_path, dependencies, script_args = args
     assert str(script_path) == str(script)
     assert dependencies == []
+    assert script_args == []
 
 
 def test_cli_uv_not_available(tmp_path, mocker):
@@ -454,3 +456,145 @@ def test_main_add_with_verbose(tmp_path, mocker):
 
     # Verify verbose logger was initialized
     mock_init_logger.assert_called_with(verbose=True)
+
+
+def test_cli_default_run_with_script_arguments(tmp_path, mocker):
+    """Test CLI default run command passes script arguments correctly."""
+    mocker.patch("autopep723.validation.check_uv_available", return_value=True)
+    mock_run_with_uv = mocker.patch("autopep723.commands.run_with_uv")
+
+    script = tmp_path / "test_script.py"
+    script.write_text("import requests")
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", str(script), "arg1", "arg2", "--flag"])
+        main()
+
+    # Verify run_with_uv was called with correct arguments
+    mock_run_with_uv.assert_called_once()
+    args = mock_run_with_uv.call_args[0]
+    script_path, dependencies, script_args = args
+
+    assert str(script_path) == str(script)
+    assert "requests" in dependencies
+    assert script_args == ["arg1", "arg2", "--flag"]
+
+
+def test_cli_default_run_with_verbose_and_script_arguments(tmp_path, mocker):
+    """Test CLI default run command with verbose flag and script arguments."""
+    mocker.patch("autopep723.validation.check_uv_available", return_value=True)
+    mock_run_with_uv = mocker.patch("autopep723.commands.run_with_uv")
+
+    script = tmp_path / "test_script.py"
+    script.write_text("import numpy")
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", "-v", str(script), "script_arg1", "--script-flag"])
+        main()
+
+    # Verify run_with_uv was called with correct arguments
+    mock_run_with_uv.assert_called_once()
+    args = mock_run_with_uv.call_args[0]
+    script_path, dependencies, script_args = args
+
+    assert str(script_path) == str(script)
+    assert "numpy" in dependencies
+    assert script_args == ["script_arg1", "--script-flag"]
+
+
+def test_cli_default_run_with_complex_arguments(tmp_path, mocker):
+    """Test CLI default run command with complex script arguments including spaces."""
+    mocker.patch("autopep723.validation.check_uv_available", return_value=True)
+    mock_run_with_uv = mocker.patch("autopep723.commands.run_with_uv")
+
+    script = tmp_path / "test_script.py"
+    script.write_text("import sys")
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", str(script), "arg with spaces", "123", "--config=file.json"])
+        main()
+
+    # Verify run_with_uv was called with correct arguments
+    mock_run_with_uv.assert_called_once()
+    args = mock_run_with_uv.call_args[0]
+    script_path, dependencies, script_args = args
+
+    assert str(script_path) == str(script)
+    assert script_args == ["arg with spaces", "123", "--config=file.json"]
+
+
+def test_cli_run_with_existing_metadata_and_script_arguments(tmp_path, mocker):
+    """Test CLI default run with existing metadata passes script arguments."""
+    mocker.patch("autopep723.validation.check_uv_available", return_value=True)
+    mocker.patch("autopep723.commands.has_pep723_metadata", return_value=True)
+    mock_run_with_uv = mocker.patch("autopep723.commands.run_with_uv")
+
+    script = tmp_path / "test_script.py"
+    script.write_text("""# /// script
+# requires-python = ">=3.13"
+# dependencies = ["requests"]
+# ///
+import requests
+""")
+
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", str(script), "test_arg", "--test-flag"])
+        main()
+
+    # Should call run_with_uv with empty deps (let uv handle metadata) but with script args
+    mock_run_with_uv.assert_called_once()
+    args = mock_run_with_uv.call_args[0]
+    script_path, dependencies, script_args = args
+    assert str(script_path) == str(script)
+    assert dependencies == []
+    assert script_args == ["test_arg", "--test-flag"]
+
+
+def test_get_script_args_from_args():
+    """Test the get_script_args_from_args function directly."""
+    from autopep723.cli import get_script_args_from_args
+
+    # Test with no arguments
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", "script.py"])
+        args = get_script_args_from_args()
+        assert args == []
+
+    # Test with script arguments
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", "script.py", "arg1", "arg2"])
+        args = get_script_args_from_args()
+        assert args == ["arg1", "arg2"]
+
+    # Test with verbose flag (should be filtered out)
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", "-v", "script.py", "arg1"])
+        args = get_script_args_from_args()
+        assert args == ["arg1"]
+
+    # Test with --verbose flag (should be filtered out)
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(sys, "argv", ["autopep723", "--verbose", "script.py", "arg1", "arg2"])
+        args = get_script_args_from_args()
+        assert args == ["arg1", "arg2"]
+
+
+def test_run_script_command_with_none_script_args(tmp_path, mocker):
+    """Test run_script_command with script_args=None to cover the None branch."""
+    mocker.patch("autopep723.validation.check_uv_available", return_value=True)
+    mock_run_with_uv = mocker.patch("autopep723.commands.run_with_uv")
+
+    script = tmp_path / "test_script.py"
+    script.write_text("import requests")
+
+    # Call run_script_command with explicit script_args=None
+    from autopep723.commands import run_script_command
+
+    run_script_command(str(script), script_args=None)
+
+    # Verify run_with_uv was called with empty list for script_args
+    mock_run_with_uv.assert_called_once()
+    args = mock_run_with_uv.call_args[0]
+    script_path, dependencies, script_args = args
+    assert str(script_path) == str(script)
+    assert script_args == []

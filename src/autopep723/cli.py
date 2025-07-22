@@ -83,3 +83,13 @@ def get_script_path_from_args() -> str:
     if not args:
         raise ValueError("No script path provided")
     return args[0]
+
+
+def get_script_args_from_args() -> list[str]:
+    """Get additional script arguments from command line arguments for default run command."""
+    # Filter out verbose flags to get all arguments
+    args = [arg for arg in sys.argv[1:] if arg not in ["-v", "--verbose"]]
+    if len(args) <= 1:
+        return []
+    # Return all arguments after the script path
+    return args[1:]
