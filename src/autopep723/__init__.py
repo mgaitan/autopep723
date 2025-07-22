@@ -7,6 +7,8 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+from .logger import command, error, verbose
+
 # Mapping for packages where import name differs from install name
 IMPORT_TO_PACKAGE_MAP = {
     "PIL": "Pillow",
@@ -78,13 +80,9 @@ def get_third_party_imports(file_path: Path) -> list[str]:
         content = file_path.read_text(encoding="utf-8")
         tree = ast.parse(content)
     except SyntaxError as e:
-        from .logger import error
-
         error(f"Error parsing {file_path}: {e}")
         return []
     except Exception as e:
-        from .logger import error
-
         error(f"Error reading {file_path}: {e}")
         return []
 
@@ -183,7 +181,6 @@ def update_file_with_metadata(file_path: Path, metadata: str) -> None:
 
 def run_with_uv(script_path: Path, dependencies: list[str]) -> None:
     """Run the script using uv run with dependencies."""
-    from .logger import command, error
 
     cmd = ["uv", "run"]
 
@@ -254,7 +251,6 @@ def download_script(url: str) -> Path:
     Raises:
         Exception: If download fails
     """
-    from .logger import error, verbose
 
     try:
         verbose(f"📥 Downloading script from: {url}")

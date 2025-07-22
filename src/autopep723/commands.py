@@ -8,7 +8,7 @@ from . import (
     run_with_uv,
     update_file_with_metadata,
 )
-from .logger import success, verbose
+from .logger import success, verbose, warning
 from .validation import validate_script_input, validate_uv_available
 
 
@@ -75,8 +75,6 @@ def add_command(script_input: str, python_version: str) -> None:
     # Note: For URLs, we can't update the original file
     # This will work on the downloaded temporary file
     if script_input != str(script_path):
-        from .logger import warning
-
         warning(f"Working with downloaded script at {script_path}")
         warning("Cannot update original remote script.")
 
