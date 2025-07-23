@@ -4,7 +4,7 @@
 [![Read the Docs](https://img.shields.io/readthedocs/autopep723)](https://autopep723.readthedocs.io/en/latest/)
 [![Changelog](https://img.shields.io/github/v/release/mgaitan/autopep723?include_prereleases&label=changelog)](https://github.com/mgaitan/autopep723/releases)
 [![CI](https://github.com/mgaitan/autopep723/actions/workflows/ci.yml/badge.svg)](https://github.com/mgaitan/autopep723/actions/workflows/ci.yml)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v0.json)](https://github.com/mgaitan/autopep723/actions/workflows/ci.yml)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/mgaitan/autopep723/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mgaitan/autopep723/blob/main/LICENSE)
 
 
